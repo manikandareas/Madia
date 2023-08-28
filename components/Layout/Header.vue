@@ -1,5 +1,8 @@
 <template>
-  <nav class="bg-white dark:border-gray-700 dark:bg-transparent dark:border-b">
+  <nav
+    class="bg-white dark:border-gray-700 dark:bg-transparent dark:border-b"
+    data-aos="fade-down"
+  >
     <div
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
     >
@@ -13,16 +16,20 @@
         >
           Get started
         </button> -->
-        <ul>
-          <li class="flex space-x-4">
+        <ul class="flex items-center space-x-4 mx-auto mr-4 md:mr-0">
+          <li class="">
             <NuxtLink to="#"
               ><IconsGit class="hover:opacity-80 transition-all ease-in"
             /></NuxtLink>
-            <NuxtLink to="#"
-              ><IconsLinkedin class="hover:opacity-80 transition-all ease-in"
-            /></NuxtLink>
+          </li>
+          <li class="">
             <NuxtLink to="#"
               ><IconsInstagram class="hover:opacity-80 transition-all ease-in"
+            /></NuxtLink>
+          </li>
+          <li class="">
+            <NuxtLink to="#"
+              ><IconsLinkedin class="hover:opacity-80 transition-all ease-in"
             /></NuxtLink>
           </li>
         </ul>
