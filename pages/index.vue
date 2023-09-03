@@ -1,5 +1,9 @@
+<script lang="ts" setup></script>
+
 <template>
-  <main class="relative w-full max-w-7xl h-screen mx-auto items-center md:flex">
+  <main
+    class="relative w-full max-w-7xl h-screen mx-auto items-center flex flex-col md:flex-row flex-wrap"
+  >
     <div data-aos="fade-down" class="flex-1 space-y-4">
       <h1 class="dark:text-white md:text-4xl font-bold">Madia Blog</h1>
       <p class="dark:text-white md:text-base text-justify max-w-[80%]">
@@ -26,17 +30,17 @@
         </li>
       </ul>
       <button
+        @click="navigateTo('/app')"
         class="px-4 py-2 dark:text-white font-semibold rounded-md shadow-md bg-[#2BC286] hover:bg-opacity-80 transition-all ease-in-out"
       >
         Jump to app
       </button>
     </div>
-    <div class="flex-1" data-aos="fade-up">
+    <div
+      class="flex-1 transition-all ease-in-out hidden md:block"
+      data-aos="fade-up"
+    >
       <UIHeroImage />
     </div>
   </main>
 </template>
-
-<script lang="ts" setup></script>
-
-<style></style>
