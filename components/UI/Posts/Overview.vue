@@ -11,10 +11,10 @@
       <!-- header blog -->
       <div class="p-6 space-y-2">
         <div class="flex items-center space-x-3">
-          <div>
+          <div class="overflow-hidden max-w-[40px]">
             <NuxtImg
               :src="avatarImgUrl"
-              class="rounded-full max-h-[40px] object-cover"
+              class="rounded-full max-h-[40px] overflow-hidden"
             />
           </div>
           <div class="leading-[17px]">
