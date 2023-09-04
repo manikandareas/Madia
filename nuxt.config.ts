@@ -28,4 +28,9 @@ export default defineNuxtConfig({
     dirs: ["~/components"],
   },
   ssr: false,
+  runtimeConfig: {
+    public: {
+      TINYMCE_KEY: process.env.TINYMCE_KEY,
+    },
+  },
 });

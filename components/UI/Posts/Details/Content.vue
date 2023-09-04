@@ -24,8 +24,8 @@
         </div>
 
         <!-- content blog -->
-        <div class="md:px-[52px] space-y-2">
-          <h1 class="font-bold text-xl md:text-4xl">
+        <div class="md:px-[52px] space-y-5">
+          <h1>
             {{ props.titlePosts }}
           </h1>
           <!-- tag -->
