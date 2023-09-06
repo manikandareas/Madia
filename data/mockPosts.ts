@@ -17,6 +17,7 @@ const posts = [
     avatarImgUrl:
       "https://i0.wp.com/gerindra.id/wp-content/uploads/2021/04/Gerindra-Logo-square-t.png?fit=512%2C512&ssl=1",
   },
+
   {
     nameOwnerPosts: "Bobur Umurzokov",
     reactionsPosts: 31,
@@ -33,7 +34,7 @@ const posts = [
     reactionsPosts: 9,
     titlePosts: "Coroutines are not just about concurrency",
     viewsPosts: 54,
-    tagPosts: ["kotlin", "coroutines", "androind", "concurrency"],
+    tagPosts: ["kotlin", "coroutines", "android", "concurrency"],
     coverImgUrl:
       "https://res.cloudinary.com/practicaldev/image/fetch/s--Fmvxtk3R--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/vq72l97g1ez67r16m1if.png",
     avatarImgUrl:

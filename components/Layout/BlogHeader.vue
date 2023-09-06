@@ -14,7 +14,7 @@
             class="transition-all ease-in-out bg-zinc-950 rounded-md border-none outline outline-slate-600 outline-1 focus:outline-2 active:outline-green-500 focus:outline-green-500 w-[420px] text-slate-100 p-2"
           />
           <button class="invisible pointer-events-auto flex items-center">
-            <IconsSearch class="absolute right-2 cursor-pointer visible" />
+            <UISearch class="absolute right-2 cursor-pointer visible" />
           </button>
         </form>
       </div>
@@ -22,6 +22,7 @@
       <!-- right -->
       <div class="flex space-x-4 items-center">
         <button
+          type="button"
           @click="$router.push('/app/new')"
           title="Create Post"
           class="px-4 py-2 text-green-500 bg-transparent border border-green-500 rounded-md font-semibold hover:text-white hover:bg-green-500 hover:underline"
@@ -56,7 +57,7 @@
                   :class="{ 'bg-green-500': active }"
                 >
                   <div class="flex flex-col cursor-pointer hover:underline">
-                    <h3 class="font-semibold">Manik</h3>
+                    <h1 class="font-semibold text-xl">Manik</h1>
                     <small class="text-slate-200">@manikxixi</small>
                   </div>
 
@@ -104,6 +105,12 @@
 
 <script lang="ts" setup>
 const client = useSupabaseClient();
+
+const searchInput = ref("");
+
+onUnmounted(() => {
+  searchInput.value = "";
+});
 
 const onSignoutPress = async () => {
   await client.auth.signOut();

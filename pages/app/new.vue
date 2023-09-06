@@ -31,16 +31,24 @@
         data-aos-duration="200"
       >
         <!-- <div>
-        <NuxtImg />
-      </div> -->
+          <NuxtImg v-if="imageUrl.publicUrl" :src="imageUrl.publicUrl" v />
+        </div> -->
         <div class="flex flex-col space-y-4">
-          <button
+          <!-- <button
             type="button"
             class="px-4 py-2 bg-transparent border font-bold w-fit border-slate-400 rounded-lg"
           >
             Add a cover image
             <input type="file" class="sr-only" />
-          </button>
+          </button> -->
+          <!-- create input image -->
+          <input
+            type="file"
+            accept="image/png, image/jpeg"
+            @change="(e) => {
+              const target = e.target as HTMLInputElement
+            }"
+          />
           <input
             type="text"
             placeholder="New post title here..."
@@ -51,7 +59,8 @@
         <Editor plugins="" v-model="form.textArea" :api-key="TINYMCE_KEY" />
         <div class="space-x-3">
           <button
-            type="submit"
+            type="button"
+            @click="handleSubmit"
             class="px-4 py-2 font-bold w-fit bg-green-500 text-white rounded-lg"
           >
             Publish
@@ -85,7 +94,6 @@ import Editor from "@tinymce/tinymce-vue";
 const form = ref({
   title: "",
   textArea: "",
-  coverImageUrl: "",
 });
 
 const config = useRuntimeConfig();
@@ -95,6 +103,37 @@ const TINYMCE_KEY = config.public.TINYMCE_KEY;
 const tabs = ref({
   activeTab: "tab-1",
 });
+
+const client = useSupabaseClient();
+
+const {
+  data: { user },
+} = await client.auth.getUser();
+
+const id = user?.id;
+
+/**
+ * Handles the form submission.
+ *
+ * This function uploads a cover image to the "madia" storage collection.
+ * If the upload is successful, it handles success.
+ * If there is an error during the upload, it handles the error.
+ */
+const handleSubmit = async () => {
+  // Upload the cover image to the "madia" storage collection
+  const { data, error } = await client.storage
+    .from("madia")
+    .upload(`${id}/cover_posts/cover.png`, "");
+
+  // Check if there was an error during the upload
+  if (error) {
+    // Handle error
+    console.log("Error:", error);
+  } else {
+    // Handle success
+    console.log("Upload successful:", data);
+  }
+};
 
 definePageMeta({
   layout: "blog",

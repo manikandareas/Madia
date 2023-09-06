@@ -19,7 +19,7 @@
           </div>
           <div class="leading-[17px]">
             <div class="flex space-x-2 items-center">
-              <h3>{{ props.nameOwnerPosts }}</h3>
+              <h3 class="text-xl">{{ props.nameOwnerPosts }}</h3>
               <IconsVerified v-if="props.verified" />
             </div>
             <small class="text-slate-300">Aug 30 (1 day ago)</small>
