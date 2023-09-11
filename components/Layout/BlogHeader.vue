@@ -1,9 +1,9 @@
 <template>
   <nav
-    class="bg-white border-gray-200 dark:bg-zinc-900 md:block hidden fixed top-0 left-0 w-full z-50"
+    class="bg-white border-black border-b dark:bg-zinc-900 md:block hidden fixed top-0 left-0 w-full z-50"
   >
     <div
-      class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-3"
+      class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-2"
     >
       <!-- left -->
       <div class="flex space-x-4 items-center">
@@ -51,19 +51,22 @@
               as="div"
               class="min-w-[250px] w-max flex flex-col absolute bg-zinc-900 opacity-100 rounded-md p-2 text z-20 right-4 top-14 space-y-2 border border-slate-400"
             >
-              <HLMenuItem v-slot="{ active }">
+              <HLMenuItem v-slot="{ active }" v-if="isSupported">
                 <div
-                  class="flex items-center justify-between px-2 py-2 rounded-md"
+                  ref="copyBtn"
+                  class="flex items-center justify-between px-2 py-2 rounded-md cursor-pointer"
                   :class="{ 'bg-green-500': active }"
+                  @click="copy()"
+                  title="Salin username"
                 >
                   <div class="flex flex-col cursor-pointer hover:underline">
                     <h1 class="font-semibold text-xl">Manik</h1>
                     <small class="text-slate-200">@manikxixi</small>
                   </div>
 
-                  <button>
-                    <IconsCopy />
-                  </button>
+                  <span type="button" @click="copy()" title="Salin username">
+                    <IconsCopy color="white" />
+                  </span>
                 </div>
               </HLMenuItem>
               <span class="border-[0px] border-b border-slate-300" />
@@ -77,18 +80,29 @@
                 </NuxtLink>
               </HLMenuItem>
               <HLMenuItem v-slot="{ active }">
-                <a
+                <NuxtLink
                   class="px-2 py-2 rounded-md cursor-pointer hover:underline flex items-center"
                   :class="{ 'bg-green-500': active }"
-                  href="/account-settings"
+                  to="/app/new"
                 >
                   <IconsAdd class="mr-2" />Post
-                </a>
+                </NuxtLink>
+              </HLMenuItem>
+              <HLMenuItem v-slot="{ active }">
+                <NuxtLink
+                  class="px-2 py-2 rounded-md cursor-pointer hover:underline flex items-center"
+                  :class="{ 'bg-green-500': active }"
+                  to="/app/settings"
+                >
+                  <IconsSettings class="mr-2" />Settings
+                </NuxtLink>
               </HLMenuItem>
               <span class="border-[0px] border-b border-slate-300" />
 
               <HLMenuItem v-slot="{ active }" class="flex items-start">
                 <button
+                  @click="onSignoutPress"
+                  type="button"
                   class="px-2 py-2 rounded-md cursor-pointer hover:underline flex items-center"
                   :class="{ 'bg-green-500': active }"
                 >
@@ -106,7 +120,15 @@
 <script lang="ts" setup>
 const client = useSupabaseClient();
 
+const copyBtn = ref();
+
+const isHovered = useElementHover(copyBtn);
+
 const searchInput = ref("");
+
+const source = ref("@manikxixi");
+
+const { copy, isSupported } = useClipboard({ source });
 
 onUnmounted(() => {
   searchInput.value = "";

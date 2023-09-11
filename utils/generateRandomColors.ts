@@ -7,10 +7,10 @@ const color = [
   "#bf2175",
 ];
 
-const getRandomColor = (): string => {
+const generateRandomColors = (): string => {
   const randomNumber = Math.round(Math.random() * color.length - 1);
 
   return color[randomNumber];
 };
 
-export default getRandomColor;
+export default generateRandomColors;

@@ -14,6 +14,15 @@
             <button
               type="button"
               :class="{ 'bg-blue-500': active }"
+              @click="filtered = null"
+            >
+              Default
+            </button>
+          </HLMenuItem>
+          <HLMenuItem v-slot="{ active }">
+            <button
+              type="button"
+              :class="{ 'bg-blue-500': active }"
               @click="handleFilter('webdev')"
             >
               Webdev
@@ -65,13 +74,46 @@
 import { PropsBlogPosts as PropsPosts } from "~/types/blog";
 import posts from "~/data/mockPosts";
 
-const filtered = ref<PropsPosts[]>();
-
+const filtered = ref<PropsPosts[] | null>();
 const handleFilter = (x: string) => {
   filtered.value = posts.filter((item) =>
     item.tagPosts.includes(x.toLocaleLowerCase())
   );
 };
+
+const client = useSupabase();
+
+// TODO: schema fetch posts
+const { useFetchAllPosts } = useBlog();
+
+const { data, error } = await useFetchAllPosts();
+
+onMounted(() => {
+  console.log(data);
+});
+
+/* TODO: schema stars
+   if user_id in stars.user_id -> unlike : push user_id to stars.user_id -> like
+   Qty views = stars.user_id.length
+
+   s
+*/
+
+/* TODO: schema views 
+  const client = useSupabase()
+  let { data, error } = await 
+    client.rpc('increment_view', {
+      row_id
+    })
+    if (error) console.error(error)
+    else console.log(data)
+*/
+
+// TODO: Process created_at to format time ex. Aug 30(1 day ago)
+
+// TODO: Implement infinite scroll
+
+// TODO: Implement realtime views and stars
 
 const mockPosts = ref<PropsPosts[]>(posts);
 

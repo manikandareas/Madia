@@ -1,25 +1,21 @@
 <template>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="20px"
-    height="20px"
-    viewBox="0 0 24 24"
-  >
-    <g
-      fill="none"
-      stroke="white"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-    >
-      <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
-      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
-    </g>
+  <svg xmlns="http://www.w3.org/2000/svg" :width="size" viewBox="0 0 24 24">
+    <path
+      :fill="color"
+      d="M7 6V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3v3c0 .552-.45 1-1.007 1H4.007A1.001 1.001 0 0 1 3 21l.003-14c0-.552.45-1 1.006-1H7Zm2 0h8v10h2V4H9v2Z"
+    ></path>
   </svg>
 </template>
 
-<script lang="ts">
-export default {
-  name: "LucideCopy",
-};
+<script lang="ts" setup>
+defineProps({
+  size: {
+    type: String,
+    default: "20px",
+  },
+  color: {
+    type: String,
+    default: "#888888",
+  },
+});
 </script>

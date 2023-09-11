@@ -36,6 +36,10 @@ $secondary: #000;
   blockquote p {
     display: inline;
   }
+  ul li {
+    margin-top: 20px;
+    list-style: inside;
+  }
 }
 
 /* Firefox */

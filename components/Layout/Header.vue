@@ -1,8 +1,5 @@
 <template>
-  <nav
-    class="bg-white dark:border-gray-700 dark:bg-transparent dark:border-b"
-    data-aos="fade-down"
-  >
+  <nav class="bg-white dark:bg-transparent" data-aos="fade-down">
     <div
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
     >

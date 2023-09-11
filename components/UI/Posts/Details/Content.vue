@@ -36,7 +36,9 @@
               v-for="tag in props.tagPosts"
               :key="tag"
             >
-              <div class="inline" :style="{ color: getRandomColor() }">#</div>
+              <div class="inline" :style="{ color: generateRandomColors() }">
+                #
+              </div>
               {{ tag }}</small
             >
           </div>
