@@ -1,7 +1,14 @@
 <template>
   <main class="text-white">
     <div
-      class="relative w-full max-w-[1024px] min-h-screen mx-auto pt-4 pb-16 md:pt-20 md:pb-14 space-y-4"
+      v-show="profileUpdating.isSuccess"
+      class="w-full bg-white text-black mt-[58px] h-12 flex items-center justify-center"
+    >
+      <h4>Your profile has been updated</h4>
+    </div>
+    <div
+      class="relative w-full max-w-[1024px] min-h-screen mx-auto pt-4 pb-16 md:pb-14 space-y-4"
+      :class="{ 'mt-[58px]': !profileUpdating.isSuccess }"
     >
       <!-- header -->
       <div class="w-full">
@@ -146,10 +153,15 @@
               </div>
             </div>
 
-            <div class="p-6 bg-zinc-900 rounded-lg">
+            <div class="p-6 bg-zinc-900 rounded-lg w-full">
               <button
+                :disabled="profileUpdating.isLoading"
                 type="submit"
-                class="py-2 text-xl font-bold rounded-md bg-green-400/80 w-full"
+                class="py-2 text-xl font-bold rounded-md w-full"
+                :class="{
+                  'bg-green-400/30': profileUpdating.isLoading,
+                  'bg-green-400/80': !profileUpdating.isLoading,
+                }"
               >
                 Save Profile Information
               </button>
@@ -246,14 +258,14 @@
 <script lang="ts" setup>
 const client = useSupabase();
 
+const profileUpdating = reactive({
+  isLoading: false,
+  isSuccess: false,
+});
+
 const {
   data: { user },
 } = await client.auth.getUser();
-
-const { data } = await client.auth.getSession();
-console.log(data);
-
-console.log(user);
 
 const { useSelectProfile, useUpdateProfile } = useProfile();
 
@@ -294,11 +306,21 @@ const accountForm = reactive({
 });
 
 const onSubmitProfilePress = async () => {
-  const { data, error } = await useUpdateProfile({
-    ...profileForm,
-    id: user?.id!,
-  });
-  console.log({ data, error });
+  try {
+    profileUpdating.isLoading = true;
+    const { error } = await useUpdateProfile({
+      ...profileForm,
+      id: user?.id!,
+    });
+
+    if (!error) {
+      profileUpdating.isSuccess = true;
+    }
+  } catch (err) {
+    throw err;
+  } finally {
+    profileUpdating.isLoading = false;
+  }
 };
 
 const onSubmitAccountPress = async () => {
@@ -311,6 +333,14 @@ onUnmounted(() => {
     newPassword: "",
     confirmPassword: "",
   });
+});
+
+watchEffect(() => {
+  if (profileUpdating.isSuccess === true) {
+    setTimeout(() => {
+      profileUpdating.isSuccess = false;
+    }, 10000);
+  }
 });
 
 definePageMeta({

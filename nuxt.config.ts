@@ -33,8 +33,9 @@ export default defineNuxtConfig({
   ssr: false,
   runtimeConfig: {
     public: {
-      TINYMCE_KEY: process.env.TINYMCE_KEY,
+      SUPABASE_PROJECT_ID: process.env.SUPABASE_PROJECT_ID,
       SUPABASE_SERVICE_ROLE: process.env.SUPABASE_SERVICE_ROLE_KEY,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_KEY,
     },
   },
 });

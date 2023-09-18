@@ -11,56 +11,38 @@
           class="flex absolute flex-col bg-zinc-950/80 backdrop-blur-md p-4 rounded-md font-bold space-y-4 max-w-fit"
         >
           <HLMenuItem v-slot="{ active }">
-            <button
-              type="button"
-              :class="{ 'bg-blue-500': active }"
-              @click="filtered = null"
-            >
+            <button type="button" :class="{ 'bg-blue-500': active }">
               Default
             </button>
           </HLMenuItem>
           <HLMenuItem v-slot="{ active }">
-            <button
-              type="button"
-              :class="{ 'bg-blue-500': active }"
-              @click="handleFilter('webdev')"
-            >
+            <button type="button" :class="{ 'bg-blue-500': active }">
               Webdev
             </button>
           </HLMenuItem>
           <HLMenuItem v-slot="{ active }">
-            <button
-              type="button"
-              :class="{ 'bg-blue-500': active }"
-              @click="handleFilter('kotlin')"
-            >
+            <button type="button" :class="{ 'bg-blue-500': active }">
               Kotlin
             </button>
           </HLMenuItem>
           <HLMenuItem v-slot="{ active }">
-            <button
-              type="button"
-              :class="{ 'bg-blue-500': active }"
-              @click="handleFilter('javascript')"
-            >
+            <button type="button" :class="{ 'bg-blue-500': active }">
               Javascript
             </button>
           </HLMenuItem>
         </HLMenuItems>
       </HLMenu>
       <UIPostsOverview
-        v-for="post in filtered ? filtered : mockPosts"
-        data-aos="zoom-in"
-        data-aos-duration="300"
-        data-aos-once="true"
-        :avatar-img-url="post.avatarImgUrl"
-        :cover-img-url="post.coverImgUrl"
-        :name-owner-posts="post.nameOwnerPosts"
-        :reaction-posts="post.reactionsPosts"
-        :tag-posts="post.tagPosts"
-        :title-posts="post.titlePosts"
-        :views-posts="post.viewsPosts"
-        :verified="post.verified"
+        v-for="post,id in (payload as PropsPosts[])"
+        :key="id"
+        :avatar-img-url="post.user.avatar_url || 'https://placehold.co/40'"
+        :cover-img-url="post.cover_image_url"
+        :name-owner-posts="post.user.username!"
+        :title-posts="post.title"
+        :views-posts="post.views"
+        :username="post.user.username"
+        :post_id="+post.id"
+        :created-at="timeFormater(post.created_at)"
       />
     </UIPostsContent>
     <!-- end content -->
@@ -72,25 +54,19 @@
 
 <script setup lang="ts">
 import { PropsBlogPosts as PropsPosts } from "~/types/blog";
-import posts from "~/data/mockPosts";
+import { timeFormater } from "~/utils/timeFormater";
 
-const filtered = ref<PropsPosts[] | null>();
-const handleFilter = (x: string) => {
-  filtered.value = posts.filter((item) =>
-    item.tagPosts.includes(x.toLocaleLowerCase())
-  );
-};
-
-const client = useSupabase();
+// const filtered = ref<PropsPosts[] | null>();
+// const handleFilter = (x: string) => {
+//   filtered.value = posts.filter((item) =>
+//     item.tagPosts.includes(x.toLocaleLowerCase())
+//   );
+// };
 
 // TODO: schema fetch posts
-const { useFetchAllPosts } = useBlog();
+const { useFetchAllPosts, useCountStars } = useBlog();
 
-const { data, error } = await useFetchAllPosts();
-
-onMounted(() => {
-  console.log(data);
-});
+const { data: payload, error } = await useFetchAllPosts();
 
 /* TODO: schema stars
    if user_id in stars.user_id -> unlike : push user_id to stars.user_id -> like
@@ -115,10 +91,22 @@ onMounted(() => {
 
 // TODO: Implement realtime views and stars
 
-const mockPosts = ref<PropsPosts[]>(posts);
+// const mockPosts = ref<PropsPosts[]>(posts);
+const user = useSupabaseUser();
+
+const enableCustomLayout = () => {
+  if (!user.value) {
+    setPageLayout("auth");
+  } else {
+    setPageLayout("blog");
+  }
+};
+
+onBeforeMount(() => {
+  enableCustomLayout();
+});
 
 definePageMeta({
-  layout: "blog",
+  layout: false,
 });
 </script>
-~/data/mockPosts

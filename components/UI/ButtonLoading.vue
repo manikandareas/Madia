@@ -24,3 +24,19 @@
     Loading...
   </button>
 </template>
+
+<script setup lang="ts">
+// const props = defineProps({
+//   mode: {
+//     type:String
+//   }
+// })
+
+// switch (props.mode) {
+//   case 'signout':
+
+//     break
+//   default:
+//     break
+// }
+</script>

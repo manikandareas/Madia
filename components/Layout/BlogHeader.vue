@@ -60,8 +60,10 @@
                   title="Salin username"
                 >
                   <div class="flex flex-col cursor-pointer hover:underline">
-                    <h1 class="font-semibold text-xl">Manik</h1>
-                    <small class="text-slate-200">@manikxixi</small>
+                    <h1 class="font-semibold text-xl">{{ profile.name }}</h1>
+                    <small class="text-slate-200"
+                      >@{{ profile.username }}</small
+                    >
                   </div>
 
                   <span type="button" @click="copy()" title="Salin username">
@@ -99,14 +101,14 @@
               </HLMenuItem>
               <span class="border-[0px] border-b border-slate-300" />
 
-              <HLMenuItem v-slot="{ active }" class="flex items-start">
+              <HLMenuItem as="div" v-slot="{ active }" class="flex items-start">
                 <button
-                  @click="onSignoutPress"
                   type="button"
-                  class="px-2 py-2 rounded-md cursor-pointer hover:underline flex items-center"
+                  @click="openModal"
+                  class="px-2 py-2 rounded-md cursor-pointer hover:underline flex items-center w-full"
                   :class="{ 'bg-green-500': active }"
                 >
-                  <IconsSignOut class="mr-2" />Sign Out
+                  <IconsSignOut class="mr-2" /> Sign Out
                 </button>
               </HLMenuItem>
             </HLMenuItems>
@@ -114,15 +116,67 @@
         </HLMenu>
       </div>
     </div>
+    <HLTransitionRoot appear :show="isOpen" as="template">
+      <HLDialog @close="closeModal" :open="isOpen" class="relative z-50">
+        <div class="fixed inset-0 overflow-y-auto">
+          <div
+            class="flex min-h-full items-center justify-center p-4 text-center"
+          >
+            <HLTransitionChild
+              as="template"
+              enter="duration-300 ease-out"
+              enter-from="opacity-0 scale-95"
+              enter-to="opacity-100 scale-100"
+              leave="duration-200 ease-in"
+              leave-from="opacity-100 scale-100"
+              leave-to="opacity-0 scale-95"
+            >
+              <HLDialogPanel
+                class="w-full max-w-md transform overflow-hidden rounded-2xl bg-black/80 backdrop-blur-md p-6 text-left align-middle shadow-xl transition-all"
+              >
+                <HLDialogTitle
+                  as="h3"
+                  class="text-lg leading-6 text-white font-bold"
+                >
+                  Sign Out
+                </HLDialogTitle>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-200">
+                    Are you sure you want to sign out?
+                  </p>
+                </div>
+
+                <div class="mt-4 w-full">
+                  <button
+                    type="button"
+                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-400 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
+                    @click="onSignoutPress"
+                  >
+                    Yes, sign out
+                  </button>
+                </div>
+              </HLDialogPanel>
+            </HLTransitionChild>
+          </div>
+        </div>
+      </HLDialog>
+    </HLTransitionRoot>
   </nav>
 </template>
 
 <script lang="ts" setup>
-const client = useSupabaseClient();
+const client = useSupabase();
 
-const copyBtn = ref();
+const router = useRouter();
 
-const isHovered = useElementHover(copyBtn);
+const { useSelectProfile } = useProfile();
+
+const {
+  data: { user },
+  error,
+} = await client.auth.getUser();
+
+const { data: profile } = await useSelectProfile(user?.id!);
 
 const searchInput = ref("");
 
@@ -130,12 +184,21 @@ const source = ref("@manikxixi");
 
 const { copy, isSupported } = useClipboard({ source });
 
+const isOpen = ref(false);
+function closeModal() {
+  isOpen.value = false;
+}
+function openModal() {
+  isOpen.value = true;
+}
+
 onUnmounted(() => {
   searchInput.value = "";
 });
 
 const onSignoutPress = async () => {
   await client.auth.signOut();
+  router.go(0);
 };
 </script>
 

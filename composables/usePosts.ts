@@ -19,7 +19,7 @@ const useUploadCover = async ({ URL, fileImage }: PropsUploadCover) => {
 };
 
 const useInsertPosts = async ({
-  user_id,
+  user,
   title,
   descriptions,
   cover_image_url,
@@ -30,7 +30,7 @@ const useInsertPosts = async ({
   const { data, count, error, status, statusText } = await client
     .from("posts")
     .insert({
-      user_id,
+      user,
       title,
       descriptions,
       cover_image_url,

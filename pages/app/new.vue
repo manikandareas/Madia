@@ -21,7 +21,7 @@
         <HLTabPanel as="div" class="flex space-x-4">
           <form
             @submit.prevent="onSubmitPress"
-            class="bg-zinc-900 rounded-lg min-w-[810px] max-w-[810px] mx-auto overflow-hidden"
+            class="bg-zinc-900 rounded-lg min-w-[810px] mx-auto overflow-hidden"
             data-aos="fade-right"
             data-aos-duration="200"
           >
@@ -32,25 +32,28 @@
               class="mx-auto"
             />
           </div> -->
-            <div class="md:px-14 space-y-4 py-8">
-              <div class="flex flex-col space-y-4">
-                <!-- create input image -->
-                <!-- <div>
-                  <input
-                    ref="myFile"
-                    id="cover"
-                    type="file"
-                    accept="image/png, image/jpeg"
-                    class="border rounded-md bg-green-900/30"
-                    disabled
-                    title="Feature coming soon ASAP!"
-                  />
-                  <label
-                    for="cover"
-                    class="text-sm text-zinc font-semibold text-zinc-400 block"
-                    >max size 500kb</label
+            <div class="space-y-4 py-8">
+              <div class="md:px-14 flex flex-col space-y-4">
+                <div>
+                  <button
+                    @click.prevent="open = true"
+                    type="button"
+                    class="px-4 py-2 bg-transparent border border-zinc-500 rounded-md font-semibold"
                   >
-                </div> -->
+                    Add a cover image
+                  </button>
+                  <ClientOnly>
+                    <DashboardModal
+                      :uppy="uppy"
+                      :open="open"
+                      :plugins="[ProgressBar, StatusBar, DragDrop]"
+                      :props="{
+                        onRequestCloseModal: handleClose,
+                      }"
+                      :theme="'dark'"
+                    />
+                  </ClientOnly>
+                </div>
                 <input
                   required
                   type="text"
@@ -61,19 +64,28 @@
                   @focus="inputActive = 'title'"
                 />
               </div>
-              <Editor
-                plugins=""
-                v-model="form.descriptions"
-                :api-key="TINYMCE_KEY"
-                @focus="inputActive = 'descriptions'"
-              />
-              <div class="">
+              <ClientOnly>
+                <!-- @vue-ignore -->
+                <MdEditor
+                  @focus="inputActive = 'descriptions'"
+                  v-model="form.descriptions"
+                  theme="dark"
+                  :preview="false"
+                  :toolbars="toolbars"
+                  :md-heading-id="mdHeadingId"
+                  :language="'en-US'"
+                  :footers="['markdownTotal', '=']"
+                />
+              </ClientOnly>
+              <div class="md:px-14">
                 <button
+                  v-if="!isLoading"
                   type="submit"
                   class="px-4 py-2 font-bold w-fit bg-green-500 text-white rounded-lg"
                 >
                   Publish
                 </button>
+                <UIButtonLoading v-else />
               </div>
             </div>
           </form>
@@ -103,9 +115,10 @@
             >
               <h3 class="text-xl">Editor Basics</h3>
               <p class="text-zinc-500">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus
-                pariatur praesentium accusamus quibusdam cupiditate explicabo
-                nihil! Ipsam explicabo accusantium consequuntur.
+                Use <a href="#" class="text-blue-400">Markdown</a> to write and
+                format posts. Minus pariatur praesentium accusamus quibusdam
+                cupiditate explicabo nihil! Ipsam explicabo accusantium
+                consequuntur.
               </p>
             </div>
           </aside>
@@ -118,7 +131,11 @@
           >
             <h1 v-html="form.title" class="mb-4" />
 
-            <div v-html="form.descriptions" />
+            <MdPreview
+              :model-value="form.descriptions"
+              :theme="'dark'"
+              style="background-color: #18181b"
+            />
           </section>
         </HLTabPanel>
       </HLTabPanels>
@@ -127,39 +144,119 @@
 </template>
 
 <script setup lang="ts">
-import Editor from "@tinymce/tinymce-vue";
+// MD Editor
+import { MdEditor, MdPreview } from "md-editor-v3";
+import "md-editor-v3/lib/style.css";
+import "md-editor-v3/lib/preview.css";
+// Uppy JS
+import { ProgressBar, StatusBar, DragDrop, DashboardModal } from "@uppy/vue";
+import Uppy from "@uppy/core";
+import Tus from "@uppy/tus";
+
+import "@uppy/core/dist/style.css";
+import "@uppy/status-bar/dist/style.min.css";
+import "@uppy/progress-bar/dist/style.min.css";
+import "@uppy/dashboard/dist/style.css";
+const client = useSupabase();
+
+const config = useRuntimeConfig();
+
+const PROJECTID = config.public.SUPABASE_PROJECT_ID;
 
 const form = reactive({
   title: "",
   descriptions: "",
   cover_image_url: "",
-  user_id: "",
+  user: "",
 });
+const TOKEN = config.public.SUPABASE_ANON_KEY;
+const bucketName = "madia";
+const {
+  data: { user },
+} = await client.auth.getUser();
+const folderName = user?.id;
+const { useGetPublicURL, useUploadCover, useInsertPosts } = usePosts();
+
+const supabaseUploadURL = `https://${PROJECTID}.supabase.co/storage/v1/upload/resumable`;
+const uppy = new Uppy().use(Tus, {
+  endpoint: supabaseUploadURL,
+  headers: {
+    authorization: `Bearer ${TOKEN}`,
+  },
+  chunkSize: 6 * 1024 * 1024,
+  allowedMetaFields: [
+    "bucketName",
+    "objectName",
+    "contentType",
+    "cacheControl",
+  ],
+});
+
+uppy.setOptions({
+  restrictions: {
+    maxNumberOfFiles: 1,
+    maxFileSize: 512000,
+  },
+});
+
+const uppyImage = ref();
+
+uppy.on("file-added", (file) => {
+  file.meta = {
+    ...file.meta,
+    bucketName: bucketName,
+    objectName: folderName
+      ? `${folderName}/coverImage/${file.name}`
+      : file.name,
+    contentType: file.type,
+  };
+  uppyImage.value = file.data;
+});
+
+uppy.on("complete", (result) => {
+  console.log(
+    "Upload complete! We’ve uploaded these files:",
+    result.successful
+  );
+});
+
+const open = ref(false);
+
+const handleClose = () => {
+  open.value = false;
+};
+
+const mdHeadingId = (_text: string, _level: string, index: string) =>
+  `H-${index}`;
+
+const toolbars = ref<string[]>([
+  "bold",
+  "underline",
+  "italic",
+  "-",
+  "title",
+  "quote",
+  "orderedList",
+  "unorderedList",
+  "task",
+  "-",
+  "code",
+  "codeRow",
+  "link",
+  "-",
+  "prettier",
+  "=",
+  "pageFullscreen",
+]);
 
 const inputActive = ref("");
 
-// const inputCover = ref<HTMLInputElement | null>(null);
+const isLoading = ref(false);
 
-// const validateImg = reactive<{
-//   error: string | null | undefined;
-//   file: File | null | undefined;
-//   dURL: string | null | undefined;
-// }>({
-//   error: null,
-//   file: null,
-//   dURL: null,
-// });
-
-const config = useRuntimeConfig();
-
-const TINYMCE_KEY = config.public.TINYMCE_KEY;
-
-const { useGetPublicURL, useUploadCover, useInsertPosts } = usePosts();
-
-const client = useSupabase();
+const router = useRouter();
 
 const onSubmitPress = async () => {
-  form.user_id = (await client.auth.getUser()).data.user?.id!;
+  form.user = (await client.auth.getUser()).data.user?.id!;
 
   // validate cover image make sure its less than 500kb & passed nsfw
   // const nameCoverImage = `${form.user_id}/cover_posts/${new Date().getTime()}-${
@@ -175,34 +272,27 @@ const onSubmitPress = async () => {
   // form.cover_image_url = await useGetPublicURL(nameCoverImage);
 
   // upload post
-  // const { error: errorInsertPosts, data: resultInserPosts } =
-  //   await useInsertPosts({
-  //     ...form,
-  //   });
+  try {
+    isLoading.value = true;
+    const { error: errorInsertPosts, data: resultInserPosts } =
+      await useInsertPosts({
+        ...form,
+      });
 
-  console.log({ ...form });
+    if (!errorInsertPosts) router.push("/app");
+  } catch (err) {
+    throw err;
+  } finally {
+    isLoading.value = false;
+  }
 };
-
-definePageMeta({
-  layout: "blog",
-});
-
-// watch(inputCover, (newValue) => {
-//   const {
-//     validate: { dURL, data, error },
-//   } = imageValidator(newValue!);
-
-//   validateImg.file = data;
-//   validateImg.error = error;
-//   validateImg.dURL = dURL;
-// });
-
-// watch(myFile, () => {
-//   console.log(myFile.value);
-// });
 
 watch(form, (newValue) => {
   form.descriptions = newValue.descriptions;
+});
+
+definePageMeta({
+  layout: "blog",
 });
 
 onUnmounted(() => {

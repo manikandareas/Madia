@@ -7,8 +7,6 @@ const form = ref<FormSignUp>({
 
 const client = useSupabaseClient();
 
-const user = useSupabaseUser();
-
 const router = useRouter();
 
 const errorSignin = ref<string>("");
@@ -24,6 +22,8 @@ const onSignInPress = async () => {
     });
     if (error) {
       errorSignin.value = error.message;
+    } else {
+      router.push("/app");
     }
   } catch (error) {
     throw error;
@@ -34,12 +34,6 @@ const onSignInPress = async () => {
 
 definePageMeta({
   layout: "auth",
-});
-
-watchEffect(() => {
-  if (user.value) {
-    router.push("/app");
-  }
 });
 </script>
 

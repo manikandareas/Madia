@@ -19,17 +19,17 @@
           </div>
           <div class="leading-[17px]">
             <h3 class="text-xl">{{ props.nameOwnerPosts }}</h3>
-            <small class="text-slate-300">Aug 30 (1 day ago)</small>
+            <small class="text-slate-300">{{ createdAt }}</small>
           </div>
         </div>
 
         <!-- content blog -->
-        <div class="md:px-[52px] space-y-5">
-          <h1>
+        <div class="md:px-[52px]">
+          <h1 class="text-5xl">
             {{ props.titlePosts }}
           </h1>
           <!-- tag -->
-          <div class="flex space-x-4 text-slate-300">
+          <div class="flex space-x-4 text-slate-300 mb-2">
             <small
               class="text-base items-center"
               v-if="props.tagPosts"
@@ -42,6 +42,13 @@
               {{ tag }}</small
             >
           </div>
+          <MdPreview
+            :model-value="props.descriptions"
+            :theme="'dark'"
+            style="background-color: #18181b; color: white"
+            :language="'en-US'"
+            preview-theme="vuepress"
+          />
         </div>
       </div>
     </div>
@@ -49,6 +56,10 @@
 </template>
 
 <script setup lang="ts">
+import { MdPreview } from "md-editor-v3";
+
+import "md-editor-v3/lib/preview.css";
+
 const props = defineProps({
   coverImgUrl: {
     type: String,
@@ -73,6 +84,15 @@ const props = defineProps({
   viewsPosts: {
     type: Number,
     default: 0,
+  },
+  descriptions: {
+    type: String,
+  },
+  createdAt: {
+    type: String,
+  },
+  post_id: {
+    type: Number,
   },
 });
 </script>

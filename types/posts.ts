@@ -4,7 +4,7 @@ export interface PropsUploadCover {
 }
 
 export interface PropsInsertPosts {
-  user_id: string;
+  user: string;
   title: string;
   descriptions: string;
   cover_image_url: string;

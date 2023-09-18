@@ -22,7 +22,7 @@
               <h3 class="text-xl">{{ props.nameOwnerPosts }}</h3>
               <IconsVerified v-if="props.verified" />
             </div>
-            <small class="text-slate-300">Aug 30 (1 day ago)</small>
+            <small class="text-slate-300">{{ props.createdAt }}</small>
           </div>
         </div>
 
@@ -52,7 +52,9 @@
             class="text-sm font-semibold flex items-center"
             title="give reactions"
           >
-            <IconsStars class="mr-2" /> {{ props.reactionPosts }} Reactions
+            <IconsStars class="mr-2" />
+            {{ 0 }}
+            Reactions
           </div>
 
           <div class="flex flex-1 items-center">
@@ -75,24 +77,28 @@ const props = defineProps({
   },
   avatarImgUrl: {
     type: String,
-    default: "https://placehold.co/40",
   },
   nameOwnerPosts: {
     type: String,
     required: true,
+  },
+  username: {
+    type: String,
   },
   titlePosts: {
     type: String,
     required: true,
   },
   tagPosts: {},
-  reactionPosts: {
-    type: Number,
-    default: 0,
-  },
   viewsPosts: {
     type: Number,
     default: 0,
+  },
+  post_id: {
+    type: Number,
+  },
+  createdAt: {
+    type: String,
   },
   verified: {
     type: Boolean,
@@ -100,5 +106,5 @@ const props = defineProps({
   },
 });
 
-const postsLink = `/app/${props.nameOwnerPosts}/${props.titlePosts}`;
+const postsLink = ref(`/app/${props.username}/${props.post_id}`);
 </script>
