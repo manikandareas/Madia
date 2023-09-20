@@ -31,7 +31,7 @@
           <!-- tag -->
           <div class="flex space-x-4 text-slate-300 mb-2">
             <small
-              class="text-base items-center"
+              class="text-base items-center font-medium italic"
               v-if="props.tagPosts"
               v-for="tag in props.tagPosts"
               :key="tag"

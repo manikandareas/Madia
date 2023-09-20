@@ -1,7 +1,7 @@
 <template>
-  <div class="md:w-[325px] max-w-[325px] hidden md:block">
+  <aside class="md:w-[200px] hidden md:block bg-zinc-900 rounded-lg h-fit">
     <slot />
-  </div>
+  </aside>
 </template>
 
 <script lang="ts" setup></script>

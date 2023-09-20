@@ -1,97 +1,81 @@
 <template>
-  <UIPostsContainer>
+  <AppHomeContainer>
     <!-- aside left -->
-    <UIPostsLeft></UIPostsLeft>
+    <AppHomeAsideTags>
+      <div class="w-full flex flex-col p-4 space-y-2">
+        <h4 class="font-bold text-xl">🏷️ Tags</h4>
+        <ul class="flex flex-col space-y-2">
+          <li
+            v-for="tag in listsTags"
+            :key="tag"
+            class="hover:underline hover:text-green-500 cursor-pointer"
+          >
+            # {{ tag }}
+          </li>
+        </ul>
+      </div>
+    </AppHomeAsideTags>
     <!-- end aside left -->
     <!-- content -->
-    <UIPostsContent>
-      <HLMenu as="div" class="relative inline-block text-white z-[50]">
-        <HLMenuButton>Filter</HLMenuButton>
-        <HLMenuItems
-          class="flex absolute flex-col bg-zinc-950/80 backdrop-blur-md p-4 rounded-md font-bold space-y-4 max-w-fit"
-        >
-          <HLMenuItem v-slot="{ active }">
-            <button type="button" :class="{ 'bg-blue-500': active }">
-              Default
-            </button>
-          </HLMenuItem>
-          <HLMenuItem v-slot="{ active }">
-            <button type="button" :class="{ 'bg-blue-500': active }">
-              Webdev
-            </button>
-          </HLMenuItem>
-          <HLMenuItem v-slot="{ active }">
-            <button type="button" :class="{ 'bg-blue-500': active }">
-              Kotlin
-            </button>
-          </HLMenuItem>
-          <HLMenuItem v-slot="{ active }">
-            <button type="button" :class="{ 'bg-blue-500': active }">
-              Javascript
-            </button>
-          </HLMenuItem>
-        </HLMenuItems>
-      </HLMenu>
-      <UIPostsOverview
-        v-for="post,id in (payload as PropsPosts[])"
-        :key="id"
+    <AppHomeContent>
+      <AppHomePosts
+        v-for="post in (payload as RowPosts[])"
+        :key="post.title"
         :avatar-img-url="post.user.avatar_url || 'https://placehold.co/40'"
-        :cover-img-url="post.cover_image_url"
+        :cover-img-url="post.cover_image_url!"
         :name-owner-posts="post.user.username!"
         :title-posts="post.title"
-        :views-posts="post.views"
+        :views-posts="post.views!"
         :username="post.user.username"
         :post_id="+post.id"
-        :created-at="timeFormater(post.created_at)"
+        :created-at="timeFormatter(post.created_at)"
       />
-    </UIPostsContent>
+    </AppHomeContent>
     <!-- end content -->
+    <AppHomeAsideTopTags>
+      <AppHomeTopTags
+        v-for="tag in topTags"
+        :tag="tag.tag"
+        :posts="tag.posts"
+      />
+    </AppHomeAsideTopTags>
     <!-- aside right -->
-    <UIPostsRight></UIPostsRight>
-    <!-- end aside right -->
-  </UIPostsContainer>
+  </AppHomeContainer>
 </template>
 
 <script setup lang="ts">
-import { PropsBlogPosts as PropsPosts } from "~/types/blog";
-import { timeFormater } from "~/utils/timeFormater";
-
-// const filtered = ref<PropsPosts[] | null>();
-// const handleFilter = (x: string) => {
-//   filtered.value = posts.filter((item) =>
-//     item.tagPosts.includes(x.toLocaleLowerCase())
-//   );
-// };
+import { RowPosts } from "~/types/posts";
 
 // TODO: schema fetch posts
-const { useFetchAllPosts, useCountStars } = useBlog();
+const { useFetchAllPosts } = usePosts();
 
 const { data: payload, error } = await useFetchAllPosts();
 
-/* TODO: schema stars
-   if user_id in stars.user_id -> unlike : push user_id to stars.user_id -> like
-   Qty views = stars.user_id.length
+const listsTags: Array<string> = ["code", "java", "kotlin", "AI"];
 
-   s
-*/
+const topTags: Array<{
+  tag: string;
+  posts: Array<{ title: string; URL: string }>;
+}> = [
+  {
+    tag: "discuss",
+    posts: [
+      { title: "Meme Monday", URL: "#" },
+      { title: 'Throw away the "Script" from "Type"Script"', URL: "#" },
+      { title: "JSDoc in JS and TS", URL: "#" },
+      { title: "Web-AR: Shaping the Future of Marketing in 2023", URL: "#" },
+    ],
+  },
+  {
+    tag: "watercooler",
+    posts: [
+      { title: "Meme Monday", URL: "#" },
+      { title: "What Crazy idea Actually Worked?", URL: "#" },
+      { title: "7 Questions SaaS founders must answer", URL: "#" },
+    ],
+  },
+];
 
-/* TODO: schema views 
-  const client = useSupabase()
-  let { data, error } = await 
-    client.rpc('increment_view', {
-      row_id
-    })
-    if (error) console.error(error)
-    else console.log(data)
-*/
-
-// TODO: Process created_at to format time ex. Aug 30(1 day ago)
-
-// TODO: Implement infinite scroll
-
-// TODO: Implement realtime views and stars
-
-// const mockPosts = ref<PropsPosts[]>(posts);
 const user = useSupabaseUser();
 
 const enableCustomLayout = () => {

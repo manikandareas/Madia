@@ -1,5 +1,5 @@
 <template>
-  <div class="dark:bg-zinc-900 text-white rounded-lg">
+  <article class="bg-zinc-900 text-white rounded-lg">
     <div class="flex flex-col">
       <!-- cover image -->
       <div class="w-full max-h-[250px] overflow-hidden" v-if="coverImgUrl">
@@ -54,7 +54,7 @@
           >
             <IconsStars class="mr-2" />
             {{ 0 }}
-            Reactions
+            Stars
           </div>
 
           <div class="flex flex-1 items-center">
@@ -67,7 +67,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </article>
 </template>
 
 <script lang="ts" setup>

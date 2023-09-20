@@ -11,10 +11,11 @@
         <form class="flex items-center relative">
           <input
             type="text"
+            placeholder="Find your friends..."
             class="transition-all ease-in-out bg-zinc-950 rounded-md border-none outline outline-slate-600 outline-1 focus:outline-2 active:outline-green-500 focus:outline-green-500 w-[420px] text-slate-100 p-2"
           />
           <button class="invisible pointer-events-auto flex items-center">
-            <UISearch class="absolute right-2 cursor-pointer visible" />
+            <IconsSearch class="absolute right-2 cursor-pointer visible" />
           </button>
         </form>
       </div>

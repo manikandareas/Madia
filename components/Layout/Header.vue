@@ -1,34 +1,20 @@
 <template>
-  <nav class="bg-white dark:bg-transparent" data-aos="fade-down">
-    <div
-      class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4"
+  <header class="bg-white dark:bg-transparent" data-aos="fade-down">
+    <nav
+      class="max-w-screen-xl flex items-center justify-between mx-auto py-4 px-2 md:px-0"
     >
       <a href="#" class="flex items-center">
         <IconsMadiaGreen />
       </a>
       <div class="flex md:order-2">
-        <!-- <button
-          type="button"
-          class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-3 md:mr-0 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-        >
-          Get started
-        </button> -->
         <ul class="flex items-center space-x-4 mx-auto mr-4 md:mr-0">
-          <li title="Go to my github">
-            <NuxtLink to="#"
-              ><IconsGit class="hover:opacity-80 transition-all ease-in"
-            /></NuxtLink>
-          </li>
-          <li title="Go to my instagram">
-            <NuxtLink to="#"
-              ><IconsInstagram class="hover:opacity-80 transition-all ease-in"
-            /></NuxtLink>
-          </li>
-          <li title="Go to my linkedin">
-            <NuxtLink to="#"
-              ><IconsLinkedin class="hover:opacity-80 transition-all ease-in"
-            /></NuxtLink>
-          </li>
+          <HomeHeaderSocialMedia
+            v-for="socialMedia in listsSocialMedia"
+            :key="socialMedia.URL + socialMedia.icon"
+            :URL="socialMedia.URL"
+            :icon="socialMedia.icon"
+            :title="socialMedia.title"
+          />
         </ul>
         <button
           data-collapse-toggle="navbar-cta"
@@ -62,32 +48,49 @@
         <ul
           class="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-transparent dark:border-gray-700"
         >
-          <li>
-            <NuxtLink
-              to="#"
-              class="block py-2 pl-3 pr-4 text-white bg-green-700 rounded md:bg-transparent md:text-green-700 md:p-0 md:dark:text-green-500"
-              aria-current="page"
-              >Home</NuxtLink
-            >
-          </li>
-          <li>
-            <NuxtLink
-              to="#"
-              class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 md:p-0 md:dark:hover:text-green-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-              >About</NuxtLink
-            >
-          </li>
-          <li>
-            <NuxtLink
-              to="/app"
-              class="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 md:p-0 md:dark:hover:text-green-500 dark:text-white dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
-              >App</NuxtLink
-            >
-          </li>
+          <HomeHeaderRoutes
+            v-for="route in pages"
+            :key="route.URL"
+            :URL="route.URL"
+            :page="route.page"
+          />
         </ul>
       </div>
-    </div>
-  </nav>
+    </nav>
+  </header>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const pages: Array<{ URL: string; page: string }> = [
+  {
+    URL: "/",
+    page: "Home",
+  },
+  {
+    URL: "/",
+    page: "About",
+  },
+  {
+    URL: "/app",
+    page: "App",
+  },
+];
+
+const listsSocialMedia: Array<{ URL: string; icon: string; title: string }> = [
+  {
+    icon: "git",
+    URL: "https://github.com/manikandareas",
+    title: "Go to my Github",
+  },
+  {
+    icon: "ig",
+    URL: "https://instagram.com/manikandareas",
+    title: "Go to my Instagram",
+  },
+  {
+    icon: "linkedin",
+    URL: "https://www.linkedin.com/in/vitomanik",
+    title: "Go to my Linkedin",
+  },
+];
+</script>

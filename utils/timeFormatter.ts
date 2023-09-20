@@ -5,7 +5,7 @@ import {
   intlFormatDistance,
 } from "date-fns";
 
-export const timeFormater = (timestamp: string) => {
+const timeFormatter = (timestamp: string) => {
   const date = new Date(timestamp);
 
   const formattedDate = format(date, "MMMM d");
@@ -13,3 +13,5 @@ export const timeFormater = (timestamp: string) => {
 
   return `${formattedDate} ( ${timeAgo} )`;
 };
+
+export default timeFormatter;

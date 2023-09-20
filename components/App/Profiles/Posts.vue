@@ -1,5 +1,5 @@
 <template>
-  <div class="dark:bg-zinc-900 text-white rounded-lg">
+  <article class="bg-zinc-900 text-white rounded-lg">
     <div class="flex flex-col">
       <!-- cover image -->
       <div class="w-full max-h-[250px] overflow-hidden" v-if="coverImgUrl">
@@ -11,23 +11,30 @@
       <!-- header blog -->
       <div class="p-6 space-y-2">
         <div class="flex items-center space-x-3">
-          <div>
+          <div class="overflow-hidden max-w-[40px]">
             <NuxtImg
               :src="avatarImgUrl"
-              class="rounded-full max-h-[40px] object-cover"
+              class="rounded-full max-h-[40px] overflow-hidden"
             />
           </div>
           <div class="leading-[17px]">
-            <h3>{{ props.nameOwnerPosts }}</h3>
-            <small class="text-slate-300">Aug 30 (1 day ago)</small>
+            <div class="flex space-x-2 items-center">
+              <h3 class="text-xl">{{ props.nameOwnerPosts }}</h3>
+              <IconsVerified v-if="props.verified" />
+            </div>
+            <small class="text-slate-300">{{ props.createdAt }}</small>
           </div>
         </div>
 
         <!-- content blog -->
         <div class="md:px-[52px] space-y-2">
-          <h1 class="font-bold text-xl md:text-3xl">
-            {{ props.titlePosts }}
-          </h1>
+          <NuxtLink :to="postsLink">
+            <h1
+              class="font-bold text-xl md:text-3xl hover:underline focus:underline"
+            >
+              {{ props.titlePosts }}
+            </h1>
+          </NuxtLink>
           <!-- tag -->
           <div class="flex space-x-4 text-slate-300">
             <small
@@ -45,7 +52,9 @@
             class="text-sm font-semibold flex items-center"
             title="give reactions"
           >
-            <IconsStars class="mr-2" /> {{ props.reactionPosts }} Reactions
+            <IconsStars class="mr-2" />
+            {{ 0 }}
+            Stars
           </div>
 
           <div class="flex flex-1 items-center">
@@ -58,7 +67,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </article>
 </template>
 
 <script lang="ts" setup>
@@ -68,24 +77,38 @@ const props = defineProps({
   },
   avatarImgUrl: {
     type: String,
-    default: "https://placehold.co/40",
   },
   nameOwnerPosts: {
     type: String,
     required: true,
+  },
+  username: {
+    type: String,
   },
   titlePosts: {
     type: String,
     required: true,
   },
   tagPosts: {},
-  reactionPosts: {
-    type: Number,
-    default: 0,
-  },
   viewsPosts: {
     type: Number,
     default: 0,
   },
+  post_id: {
+    type: Number,
+  },
+  createdAt: {
+    type: String,
+  },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
+  descriptions: {
+    type: String,
+    required: true,
+  },
 });
+
+const postsLink = ref(`/app/${props.username}/${props.post_id}`);
 </script>
