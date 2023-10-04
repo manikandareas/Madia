@@ -1,21 +1,13 @@
 <template>
-  <main class="text-white">
-    <div
-      v-show="profileUpdating.isSuccess"
-      class="w-full bg-white text-black mt-[58px] h-12 flex items-center justify-center"
-    >
-      <h4>Your profile has been updated</h4>
-    </div>
+  <AppSettingsContainer>
+    <AppSettingsPopupUpdated :isSuccess="profileUpdating.isSuccess" />
+    <AppSettingsFirstSignin :isNewUser="!username" />
     <div
       class="relative w-full max-w-[1024px] min-h-screen mx-auto pt-4 pb-16 md:pb-14 space-y-4"
       :class="{ 'mt-[58px]': !profileUpdating.isSuccess }"
     >
       <!-- header -->
-      <div class="w-full">
-        <h2 class="text-3xl">
-          Setting for <span class="text-green-500">@manikxixi</span>
-        </h2>
-      </div>
+      <AppSettingsHeader :username="(username as string)" />
 
       <!-- content -->
       <HLTabGroup as="div" class="flex space-x-4">
@@ -43,7 +35,7 @@
             @submit.prevent="onSubmitProfilePress"
           >
             <div class="bg-zinc-900 rounded-lg p-6">
-              <h3 class="mb-4">User</h3>
+              <h3 class="mb-2 text-xl font-bold">User</h3>
               <div class="flex flex-col space-y-4">
                 <div class="space-y-2">
                   <label for="name">Name</label>
@@ -76,7 +68,7 @@
             </div>
 
             <div class="bg-zinc-900 rounded-lg p-6">
-              <h3 class="mb-4">Basic</h3>
+              <h3 class="mb-2 text-xl font-bold">Basic</h3>
               <div class="flex flex-col space-y-4">
                 <div class="space-y-2">
                   <label for="website-url">Website URL</label>
@@ -112,7 +104,7 @@
             </div>
 
             <div class="bg-zinc-900 rounded-lg p-6">
-              <h3 class="mb-4">Social Media</h3>
+              <h3 class="mb-2 text-xl font-bold">Social Media</h3>
               <div class="flex flex-col space-y-4">
                 <div class="space-y-2">
                   <label for="website-url" class="flex space-x-2 items-center"
@@ -252,12 +244,12 @@
         </HLTabPanels>
       </HLTabGroup>
     </div>
-  </main>
+  </AppSettingsContainer>
 </template>
 
 <script lang="ts" setup>
 const client = useSupabase();
-
+const { $toast, $router } = useNuxtApp();
 const profileUpdating = reactive({
   isLoading: false,
   isSuccess: false,
@@ -267,9 +259,9 @@ const {
   data: { user },
 } = await client.auth.getUser();
 
-const { useSelectProfile, useUpdateProfile } = useProfile();
+const { useSelectProfileByID, useUpdateProfile } = useProfile();
 
-const { data: profile } = await useSelectProfile(user?.id!);
+const { data: profile } = await useSelectProfileByID(user?.id!);
 
 const {
   avatar_url,
@@ -305,6 +297,13 @@ const accountForm = reactive({
   confirmPassword: "",
 });
 
+const scrollToTop = () => {
+  window.scroll({
+    behavior: "smooth",
+  });
+  window.scrollTo(0, 0);
+};
+
 const onSubmitProfilePress = async () => {
   try {
     profileUpdating.isLoading = true;
@@ -315,11 +314,16 @@ const onSubmitProfilePress = async () => {
 
     if (!error) {
       profileUpdating.isSuccess = true;
+      $toast.success("Profile already updated 🤤", {
+        duration: 120000,
+        dismissible: true,
+      });
     }
   } catch (err) {
     throw err;
   } finally {
     profileUpdating.isLoading = false;
+    scrollToTop();
   }
 };
 

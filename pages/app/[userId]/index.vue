@@ -6,18 +6,21 @@
     <AppProfilesContent>
       <AppProfilesPosts
         v-if="posts?.length! > 0"
-        v-for="(post,index) in (posts as RowPosts[])"
+        v-for="(post) in (posts as RowPosts[])"
         data-aos-once="true"
         data-aos="zoom-in"
         data-aos-duration="300"
-        :key="index"
+        :key="post.title"
         :avatar-img-url="post.user.avatar_url || 'https://placehold.co/40'"
         :cover-img-url="post.cover_image_url!"
-        :name-owner-posts="post.user.name!"
-        :reaction-posts="post.stars"
-        :tag-posts="post.tags"
+        :name="post.user.name!"
         :title-posts="post.title"
         :views-posts="post.views!"
+        :username="post.user.username"
+        :post_id="+post.id"
+        :tag-posts="post.tags"
+        :posts_url="post.posts_url!"
+        :created-at="timeFormatter(post.created_at)"
         :descriptions="post.descriptions!"
       />
       <div
@@ -32,24 +35,19 @@
 
 <script lang="ts" setup>
 import { RowPosts } from "~/types/posts";
-
-const client = useSupabase();
-const user = useSupabaseUser();
 const route = useRoute();
+const user = useSupabaseUser();
+const userId = ref(route.params?.userId! as string);
+const { useFetchPostsByID } = usePosts();
 
-const { useFetchPostsByUsername } = usePosts();
+const { useSelectProfileByID } = useProfile();
 
-const { useSelectProfile } = useProfile();
+const { data: profile } = await useSelectProfileByID(
+  route.params.userId! as string
+);
 
-const username = route.params.username as string;
-
-const {
-  data: { user: payloadUser },
-} = await client.auth.getUser();
-
-const { data: profile } = await useSelectProfile(payloadUser?.id!);
-
-const { data: posts } = await useFetchPostsByUsername(username);
+const { data: posts } = await useFetchPostsByID(route.params.userId! as string);
+console.log(posts);
 
 const enableCustomLayout = () => {
   if (!user.value) {

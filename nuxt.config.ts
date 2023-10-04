@@ -36,6 +36,7 @@ export default defineNuxtConfig({
       SUPABASE_PROJECT_ID: process.env.SUPABASE_PROJECT_ID,
       SUPABASE_SERVICE_ROLE: process.env.SUPABASE_SERVICE_ROLE_KEY,
       SUPABASE_ANON_KEY: process.env.SUPABASE_KEY,
+      SUPABASE_URL: process.env.SUPABASE_URL,
     },
   },
 });

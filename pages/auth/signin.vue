@@ -5,6 +5,8 @@ const form = ref<FormSignUp>({
   password: "",
 });
 
+const { $toast } = useNuxtApp();
+
 const client = useSupabaseClient();
 
 const router = useRouter();
@@ -20,6 +22,13 @@ const onSignInPress = async () => {
       email: form.value.email,
       password: form.value.password,
     });
+
+    $toast.success("Successfully signed in 🫡", {
+      position: "bottom-right",
+      duration: 120000,
+      dismissible: true,
+    });
+
     if (error) {
       errorSignin.value = error.message;
     } else {

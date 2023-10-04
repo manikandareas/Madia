@@ -1,6 +1,6 @@
 <template>
-  <nav
-    class="bg-white border-black border-b dark:bg-zinc-900 md:block hidden fixed top-0 left-0 w-full z-50"
+  <header
+    class="border-black border-b bg-zinc-900 md:block hidden top-0 left-0 w-full z-[100] sticky"
   >
     <div
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-2"
@@ -77,7 +77,7 @@
                 <NuxtLink
                   class="px-2 py-2 rounded-md cursor-pointer hover:underline flex items-center"
                   :class="{ 'bg-green-500': active }"
-                  to="/app/manikxixi"
+                  :to="`/app/${profile.id}`"
                 >
                   <IconsDahsboard class="mr-2" />Dashboard
                 </NuxtLink>
@@ -119,6 +119,7 @@
     </div>
     <HLTransitionRoot appear :show="isOpen" as="template">
       <HLDialog @close="closeModal" :open="isOpen" class="relative z-50">
+        <div class="fixed inset-0 bg-black/40" aria-hidden="true" />
         <div class="fixed inset-0 overflow-y-auto">
           <div
             class="flex min-h-full items-center justify-center p-4 text-center"
@@ -150,10 +151,16 @@
                 <div class="mt-4 w-full">
                   <button
                     type="button"
-                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-400 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
+                    class="inline-flex w-full justify-center items-center transition-all ease-linear rounded-md border border-transparent bg-red-400 px-4 py-2 text-sm font-medium text-white hover:bg-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
                     @click="onSignoutPress"
+                    @mouseover="isLogoutHover = true"
+                    @mouseout="isLogoutHover = false"
                   >
                     Yes, sign out
+                    <span
+                      class="ml-2 text-2xl transition-all ease-linear delay-200"
+                      >{{ isLogoutHover ? "😡" : "🫠" }}</span
+                    >
                   </button>
                 </div>
               </HLDialogPanel>
@@ -162,7 +169,7 @@
         </div>
       </HLDialog>
     </HLTransitionRoot>
-  </nav>
+  </header>
 </template>
 
 <script lang="ts" setup>
@@ -170,20 +177,22 @@ const client = useSupabase();
 
 const router = useRouter();
 
-const { useSelectProfile } = useProfile();
+const { useSelectProfileByID } = useProfile();
 
 const {
   data: { user },
   error,
 } = await client.auth.getUser();
 
-const { data: profile } = await useSelectProfile(user?.id!);
+const { data: profile } = await useSelectProfileByID(user?.id!);
 
 const searchInput = ref("");
 
 const source = ref("@manikxixi");
 
 const { copy, isSupported } = useClipboard({ source });
+
+const isLogoutHover = ref(false);
 
 const isOpen = ref(false);
 function closeModal() {

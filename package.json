@@ -32,11 +32,13 @@
     "@uppy/tus": "^3.2.0",
     "@uppy/vue": "^1.0.2",
     "@uppy/webcam": "^3.3.2",
+    "@uppy/xhr-upload": "^3.4.1",
     "@vavt/md-editor-extension": "^3.0.0",
     "date-fns": "^2.30.0",
     "md-editor-v3": "^4.6.1",
     "nuxt-headlessui": "^1.1.4",
     "sass": "^1.66.1",
-    "vue-date-fns": "^2.0.2"
+    "vue-date-fns": "^2.0.2",
+    "vue-toast-notification": "^3"
   }
 }

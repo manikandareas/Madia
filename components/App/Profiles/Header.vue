@@ -14,7 +14,7 @@
     </div>
     <!-- desc -->
     <div class="items-center flex flex-col space-y-6 h-auto">
-      <h1 class="text-3xl font-bold">{{ profile?.username }}</h1>
+      <h1 class="text-3xl font-bold">{{ profile?.name }}</h1>
       <p class="text-xl font-medium">
         {{ profile?.bio }}
       </p>

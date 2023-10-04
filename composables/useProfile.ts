@@ -1,6 +1,6 @@
-import { ProfileProps, UpdateProfileProps } from "~/types/profile";
+import { RowProfile, UpdateProfile } from "~/types/profile";
 
-const useSelectProfile = async (id: string) => {
+const useSelectProfileByID = async (id: string) => {
   const client = useSupabase();
 
   const { data: rawData, error } = await client
@@ -8,7 +8,7 @@ const useSelectProfile = async (id: string) => {
     .select("*")
     .eq("id", id);
 
-  const data = rawData![0] as ProfileProps;
+  const data = rawData![0] as RowProfile;
 
   return {
     data,
@@ -16,10 +16,12 @@ const useSelectProfile = async (id: string) => {
   };
 };
 
-const useUpdateProfile = async (x: UpdateProfileProps) => {
+const useUpdateProfile = async (x: UpdateProfile) => {
   const client = useSupabase();
 
-  const { data: prevData, error: prevError } = await useSelectProfile(x.id);
+  const { data: prevData, error: prevError } = await useSelectProfileByID(
+    x.id!
+  );
 
   const { data, error } = await client
     .from("profile")
@@ -37,7 +39,7 @@ const useUpdateProfile = async (x: UpdateProfileProps) => {
       github_url: x.github_url ? x.github_url : prevData?.github_url,
       linkedin_url: x.linkedin_url ? x.linkedin_url : prevData?.linkedin_url,
     })
-    .eq("id", x.id)
+    .eq("id", x.id!)
     .select();
 
   return {
@@ -49,6 +51,6 @@ const useUpdateProfile = async (x: UpdateProfileProps) => {
 export const useProfile = () => {
   return {
     useUpdateProfile,
-    useSelectProfile,
+    useSelectProfileByID,
   };
 };

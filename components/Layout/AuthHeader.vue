@@ -1,6 +1,6 @@
 <template>
-  <nav class="md:block hidden fixed top-0 left-0 w-full z-50">
-    <div
+  <header class="md:block hidden sticky top-0 left-0 w-full z-50 bg-black">
+    <nav
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-3"
     >
       <!-- left -->
@@ -19,8 +19,8 @@
           {{ actionTitle }}
         </button>
       </div>
-    </div>
-  </nav>
+    </nav>
+  </header>
 </template>
 
 <script lang="ts" setup>

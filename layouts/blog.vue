@@ -1,6 +1,6 @@
 <template>
   <div class="dark text-white dark:bg-black relative">
-    <LayoutBlogHeader data-aos="fade-down" data-aos-duration="300" />
+    <LayoutBlogHeader />
     <LayoutBlogHeaderSm />
     <slot />
   </div>

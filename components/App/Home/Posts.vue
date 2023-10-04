@@ -19,7 +19,11 @@
           </div>
           <div class="leading-[17px]">
             <div class="flex space-x-2 items-center">
-              <h3 class="text-xl">{{ props.nameOwnerPosts }}</h3>
+              <NuxtLink
+                :to="`/app/${props.user_id}`"
+                class="text-xl hover:underline"
+                >{{ props.name }}</NuxtLink
+              >
               <IconsVerified v-if="props.verified" />
             </div>
             <small class="text-slate-300">{{ props.createdAt }}</small>
@@ -28,7 +32,7 @@
 
         <!-- content blog -->
         <div class="md:px-[52px] space-y-2">
-          <NuxtLink :to="postsLink">
+          <NuxtLink :to="props.posts_url || '/app'">
             <h1
               class="font-bold text-xl md:text-3xl hover:underline focus:underline"
             >
@@ -39,9 +43,9 @@
           <div class="flex space-x-4 text-slate-300">
             <small
               v-if="props.tagPosts"
-              v-for="tag in props.tagPosts"
-              :key="tag"
-              >#{{ tag }}</small
+              v-for="tag in (props.tagPosts as RowTags[])"
+              :key="tag.id"
+              ><span :style="{ color: tag.color }"># </span>{{ tag.tag }}</small
             >
           </div>
         </div>
@@ -71,6 +75,8 @@
 </template>
 
 <script lang="ts" setup>
+import { RowTags } from "~/types/tags";
+
 const props = defineProps({
   coverImgUrl: {
     type: String,
@@ -78,7 +84,7 @@ const props = defineProps({
   avatarImgUrl: {
     type: String,
   },
-  nameOwnerPosts: {
+  name: {
     type: String,
     required: true,
   },
@@ -100,11 +106,19 @@ const props = defineProps({
   createdAt: {
     type: String,
   },
+  posts_url: {
+    type: String,
+    required: true,
+  },
   verified: {
     type: Boolean,
     default: false,
   },
+  user_id: {
+    type: String,
+    required: true,
+  },
 });
 
-const postsLink = ref(`/app/${props.username}/${props.post_id}`);
+// const postsLink = ref(`/app/${props.username}/${props.post_id}`);
 </script>

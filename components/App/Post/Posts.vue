@@ -25,7 +25,7 @@
 
         <!-- content blog -->
         <div class="md:px-[52px]">
-          <h1 class="text-5xl">
+          <h1 class="text-5xl font-bold">
             {{ props.titlePosts }}
           </h1>
           <!-- tag -->
@@ -33,13 +33,11 @@
             <small
               class="text-base items-center font-medium italic"
               v-if="props.tagPosts"
-              v-for="tag in props.tagPosts"
-              :key="tag"
+              v-for="tag in (props.tagPosts as RowTags[])"
+              :key="tag.id"
             >
-              <div class="inline" :style="{ color: generateRandomColors() }">
-                #
-              </div>
-              {{ tag }}</small
+              <div class="inline" :style="{ color: tag.color }">#</div>
+              {{ tag.tag }}</small
             >
           </div>
           <MdPreview
@@ -59,6 +57,7 @@
 import { MdPreview } from "md-editor-v3";
 
 import "md-editor-v3/lib/preview.css";
+import { RowTags } from "~/types/tags";
 
 const props = defineProps({
   coverImgUrl: {

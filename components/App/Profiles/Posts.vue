@@ -13,22 +13,22 @@
         <div class="flex items-center space-x-3">
           <div class="overflow-hidden max-w-[40px]">
             <NuxtImg
-              :src="avatarImgUrl"
+              :src="props.avatarImgUrl || 'https://placehold.co/40'"
               class="rounded-full max-h-[40px] overflow-hidden"
             />
           </div>
           <div class="leading-[17px]">
             <div class="flex space-x-2 items-center">
-              <h3 class="text-xl">{{ props.nameOwnerPosts }}</h3>
+              <h3 class="text-xl">{{ props.name }}</h3>
               <IconsVerified v-if="props.verified" />
             </div>
-            <small class="text-slate-300">{{ props.createdAt }}</small>
+            <small class="text-slate-300">{{ props.createdAt! }}</small>
           </div>
         </div>
 
         <!-- content blog -->
         <div class="md:px-[52px] space-y-2">
-          <NuxtLink :to="postsLink">
+          <NuxtLink :to="props.posts_url || '/app'">
             <h1
               class="font-bold text-xl md:text-3xl hover:underline focus:underline"
             >
@@ -39,9 +39,9 @@
           <div class="flex space-x-4 text-slate-300">
             <small
               v-if="props.tagPosts"
-              v-for="tag in props.tagPosts"
-              :key="tag"
-              >#{{ tag }}</small
+              v-for="tag in (props.tagPosts as RowTags[])"
+              :key="tag.id"
+              ><span :style="{ color: tag.color }"># </span>{{ tag.tag }}</small
             >
           </div>
         </div>
@@ -71,6 +71,8 @@
 </template>
 
 <script lang="ts" setup>
+import { RowTags } from "~/types/tags";
+
 const props = defineProps({
   coverImgUrl: {
     type: String,
@@ -78,7 +80,7 @@ const props = defineProps({
   avatarImgUrl: {
     type: String,
   },
-  nameOwnerPosts: {
+  name: {
     type: String,
     required: true,
   },
@@ -108,7 +110,11 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  posts_url: {
+    type: String,
+    required: true,
+  },
 });
 
-const postsLink = ref(`/app/${props.username}/${props.post_id}`);
+// const postsLink = ref(`/app/${props.username}/${props.post_id}`);
 </script>

@@ -1,4 +1,5 @@
 import { RowPosts, InsertPosts } from "~/types/posts";
+import { RowTags } from "~/types/tags";
 
 const useGetPublicURL = async (URL: string) => {
   const client = useSupabase();
@@ -11,7 +12,7 @@ const useUploadCover = async ({
   fileImage,
 }: {
   URL: string;
-  fileImage: File;
+  fileImage: File | Blob;
 }) => {
   const client = useSupabase();
   const { data, error } = await client.storage
@@ -29,6 +30,7 @@ const useInsertPosts = async ({
   title,
   descriptions,
   cover_image_url,
+  tags,
 }: InsertPosts) => {
   const client = useSupabase();
 
@@ -40,6 +42,7 @@ const useInsertPosts = async ({
       title,
       descriptions,
       cover_image_url,
+      tags,
     });
 
   return { data, count, error, status, statusText };
@@ -60,8 +63,10 @@ const useFetchAllPosts = async () => {
     cover_image_url,
     views,
     tags,
+    posts_url,
     created_at,
     user (
+      id,
       username,
       name,
       avatar_url
@@ -93,10 +98,12 @@ const useFetchSinglePosts = async (id: number) => {
     tags,
     descriptions,
     created_at,
+    posts_url,
     user (
       username,
       name,
-      avatar_url
+      avatar_url,
+      id
     )
     `
     )
@@ -107,7 +114,7 @@ const useFetchSinglePosts = async (id: number) => {
   return { count, data, error, status, statusText };
 };
 
-const useFetchPostsByUsername = async (username: string) => {
+const useFetchPostsByID = async (id: string) => {
   const client = useSupabase();
   let { data: payloads, error } = await client
     .from("posts")
@@ -119,15 +126,17 @@ const useFetchPostsByUsername = async (username: string) => {
       views,
       tags,
       descriptions,
+      posts_url,
       created_at,
       user (
         username,
         name,
-        avatar_url
-      )
+        avatar_url,
+        id
+      ) 
       `
     )
-    .eq("user.username", username);
+    .eq("user", id);
 
   let data = payloads as RowPosts[];
   return {
@@ -145,14 +154,42 @@ const useIncreaseViews = async (id: number) => {
     });
 };
 
+const useGetListsTags = async () => {
+  const client = useSupabase();
+  let { data: tags, error } = await client.from("tags").select("*");
+  let data = tags as RowTags[];
+  console.log(data);
+
+  return {
+    data,
+    error,
+  };
+};
+
+const useFetchAllPostsWhereTags = async (tags: string) => {
+  const client = useSupabase();
+  let { data: payload, error } = await client
+    .from("posts")
+    .select(`*`)
+    .eq("tags", tags);
+  let data = payload as RowPosts[];
+
+  return {
+    data,
+    error,
+  };
+};
+
 export const usePosts = () => {
   return {
+    useGetListsTags,
     useGetPublicURL,
     useUploadCover,
     useInsertPosts,
     useFetchAllPosts,
     useIncreaseViews,
-    useFetchPostsByUsername,
+    useFetchPostsByID,
     useFetchSinglePosts,
+    useFetchAllPostsWhereTags,
   };
 };

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { FormSignUp } from "~/types/form";
 
+const { $toast } = useNuxtApp();
+
 const form = ref<FormSignUp>({
   email: "",
   password: "",
@@ -23,6 +25,10 @@ const onSignUpPress = async () => {
     });
     if (error) {
       signupError.value = error.message;
+      $toast.success("Yeayy... your account was successfully created! 🤩", {
+        duration: 120000,
+        dismissible: true,
+      });
     }
     resultSignUp.value.user = data.user;
   } catch (error) {
@@ -116,7 +122,7 @@ definePageMeta({
           <button
             @click.prevent="onSignInGithubPress"
             type="button"
-            class="py-2 px-4 max-w-md flex justify-center items-center bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
+            class="py-2 px-4 mt-2 max-w-md flex justify-center items-center bg-gray-600 hover:bg-gray-700 focus:ring-gray-500 focus:ring-offset-gray-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
