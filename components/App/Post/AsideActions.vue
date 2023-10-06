@@ -1,5 +1,5 @@
 <template>
-  <aside class="w-16flex justify-center">
+  <aside class="w-16 hidden md:flex justify-center">
     <div class="flex flex-col space-y-8 py-12">
       <div class="flex flex-col items-center justify-items-center">
         <IconsLove size="25px" />

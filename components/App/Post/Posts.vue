@@ -25,7 +25,7 @@
 
         <!-- content blog -->
         <div class="md:px-[52px]">
-          <h1 class="text-5xl font-bold">
+          <h1 class="text-3xl md:text-5xl font-bold">
             {{ props.titlePosts }}
           </h1>
           <!-- tag -->

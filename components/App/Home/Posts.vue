@@ -58,12 +58,18 @@
               class="text-sm font-semibold flex items-center"
               title="give reactions"
               type="button"
-              @click="() => handlerStars()"
+              @click="
+                () =>
+                  user
+                    ? handlerStars()
+                    : $toast.warning('Not now... you\'re not logged in yet 😵')
+              "
             >
               <IconsStars
                 class="mr-2"
                 :style="{
-                  color: statusStars.isUserReadyStars ? 'yellow' : 'white',
+                  color:
+                    statusStars.isUserReadyStars && user ? 'yellow' : 'white',
                 }"
               />
               {{ stars }}
@@ -129,6 +135,13 @@ const props = defineProps({
 
 import { RowTags } from "~/types/tags";
 
+const user = useSupabaseUser();
+const client = useSupabase();
+const {
+  data: { user: privateData },
+  error: privateError,
+} = await client.auth.getUser();
+
 const { useHandlerStars, useCountStarsWherePostID, useStatusStars } =
   usePosts();
 
@@ -138,29 +151,33 @@ const statusStars = reactive({
   isUserReadyStars: false,
 });
 
+console.log(statusStars.isUserReadyStars);
+
 const updateStatusStars = async () => {
-  let { data, error } = await useStatusStars(props.post_id!, props.user_id);
+  let { data, error } = await useStatusStars(props.post_id!, privateData?.id!);
   statusStars.isUserReadyStars = data!;
 };
 
 const countingStars = async () => {
-  console.log("counting stars");
   stars.value = await useCountStarsWherePostID(props.post_id!).then(
     (r) => r.data!
   );
-  console.log(stars.value);
 };
 
 const handlerStars = async () => {
   await updateStatusStars();
   if (statusStars.isUserReadyStars) {
-    await useHandlerStars(props.post_id!, props.user_id);
+    await useHandlerStars(props.post_id!, privateData?.id!);
     stars.value -= 1;
   } else {
-    await useHandlerStars(props.post_id!, props.user_id);
+    await useHandlerStars(props.post_id!, privateData?.id!);
     stars.value += 1;
   }
 };
+
+onBeforeMount(async () => {
+  await updateStatusStars();
+});
 
 onBeforeMount(async () => {
   await countingStars();

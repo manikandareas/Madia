@@ -48,14 +48,27 @@
 
         <!-- footer blog -->
         <div class="md:px-[52px] flex space-x-4">
-          <div
+          <button
             class="text-sm font-semibold flex items-center"
             title="give reactions"
+            type="button"
+            @click="
+              () =>
+                user
+                  ? handlerStars()
+                  : $toast.warning('Not now... you\'re not logged in yet 😵')
+            "
           >
-            <IconsStars class="mr-2" />
-            {{ 0 }}
+            <IconsStars
+              class="mr-2"
+              :style="{
+                color:
+                  statusStars.isUserReadyStars && user ? 'yellow' : 'white',
+              }"
+            />
+            {{ stars }}
             Stars
-          </div>
+          </button>
 
           <div class="flex flex-1 items-center">
             <IconsComment class="mr-2" /> Comments
@@ -115,6 +128,56 @@ const props = defineProps({
     required: true,
   },
 });
+const user = useSupabaseUser();
 
-// const postsLink = ref(`/app/${props.username}/${props.post_id}`);
+const client = useSupabase();
+const {
+  data: { user: privateData },
+  error: privateError,
+} = await client.auth.getUser();
+
+const { useHandlerStars, useCountStarsWherePostID, useStatusStars } =
+  usePosts();
+
+const stars = ref(0);
+
+const statusStars = reactive({
+  isUserReadyStars: false,
+});
+
+console.log(statusStars.isUserReadyStars);
+
+const updateStatusStars = async () => {
+  let { data, error } = await useStatusStars(props.post_id!, privateData?.id!);
+  statusStars.isUserReadyStars = data!;
+};
+
+const countingStars = async () => {
+  stars.value = await useCountStarsWherePostID(props.post_id!).then(
+    (r) => r.data!
+  );
+};
+
+const handlerStars = async () => {
+  await updateStatusStars();
+  if (statusStars.isUserReadyStars) {
+    await useHandlerStars(props.post_id!, privateData?.id!);
+    stars.value -= 1;
+  } else {
+    await useHandlerStars(props.post_id!, privateData?.id!);
+    stars.value += 1;
+  }
+};
+
+onBeforeMount(async () => {
+  await updateStatusStars();
+});
+
+onBeforeMount(async () => {
+  await countingStars();
+});
+
+watch(stars, async (newPayload, oldPayload) => {
+  await updateStatusStars();
+});
 </script>
