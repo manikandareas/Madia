@@ -18,7 +18,7 @@
             />
           </div>
           <div class="leading-[17px]">
-            <h3 class="text-xl">{{ props.nameOwnerPosts }}</h3>
+            <h3 class="text-xl">{{ props.name }}</h3>
             <small class="text-slate-300">{{ createdAt }}</small>
           </div>
         </div>
@@ -67,7 +67,7 @@ const props = defineProps({
     type: String,
     default: "https://placehold.co/40",
   },
-  nameOwnerPosts: {
+  name: {
     type: String,
     required: true,
   },

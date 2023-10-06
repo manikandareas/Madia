@@ -1,4 +1,5 @@
 import { RowPosts, InsertPosts } from "~/types/posts";
+
 import { RowTags } from "~/types/tags";
 
 const useGetPublicURL = async (URL: string) => {
@@ -166,6 +167,7 @@ const useGetListsTags = async () => {
   };
 };
 
+// TODO
 const useFetchAllPostsWhereTags = async (tags: string) => {
   const client = useSupabase();
   let { data: payload, error } = await client
@@ -180,8 +182,52 @@ const useFetchAllPostsWhereTags = async (tags: string) => {
   };
 };
 
+const useCountStarsWherePostID = async (p_post_id: number) => {
+  const client = useSupabase();
+
+  let { data, error } = await client
+    // @ts-ignore
+    .rpc("count_stars_by_post", {
+      p_post_id,
+    });
+
+  return {
+    data,
+    error,
+  };
+};
+
+const useHandlerStars = async (p_post_id: number, p_user_id: string) => {
+  const client = useSupabase();
+
+  // @ts-ignore
+  let { data, error } = await client.rpc("insert_or_delete_star", {
+    p_post_id,
+    p_user_id,
+  });
+
+  if (error) console.error(error);
+  else console.log(data);
+};
+
+const useStatusStars = async (p_post_id: number, p_user_id: string) => {
+  const client = useSupabase();
+
+  //@ts-ignore
+  let { data, error } = await client.rpc("check_already_star", {
+    p_post_id,
+    p_user_id,
+  });
+
+  return {
+    data: data ? (data as boolean) : null,
+    error,
+  };
+};
+
 export const usePosts = () => {
   return {
+    useStatusStars,
     useGetListsTags,
     useGetPublicURL,
     useUploadCover,
@@ -190,6 +236,8 @@ export const usePosts = () => {
     useIncreaseViews,
     useFetchPostsByID,
     useFetchSinglePosts,
+    useCountStarsWherePostID,
+    useHandlerStars,
     useFetchAllPostsWhereTags,
   };
 };

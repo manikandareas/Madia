@@ -7,7 +7,7 @@
       <AppPostPosts
         :avatar-img-url="posts?.user.avatar_url || 'https://placehold.co/40'"
         :cover-img-url="posts?.cover_image_url!"
-        :name-owner-posts="posts?.user.username!"
+        :name="posts?.user.name!"
         :tag-posts="posts?.tags"
         :title-posts="posts?.title!"
         :views-posts="posts?.views!"

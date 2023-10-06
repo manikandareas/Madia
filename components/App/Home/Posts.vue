@@ -51,16 +51,25 @@
         </div>
 
         <!-- footer blog -->
-        <div class="md:px-[52px] flex space-x-4">
-          <div
-            class="text-sm font-semibold flex items-center"
-            title="give reactions"
-          >
-            <IconsStars class="mr-2" />
-            {{ 0 }}
-            Stars
-          </div>
 
+        <div class="md:px-[52px] flex space-x-4">
+          <ClientOnly>
+            <button
+              class="text-sm font-semibold flex items-center"
+              title="give reactions"
+              type="button"
+              @click="() => handlerStars()"
+            >
+              <IconsStars
+                class="mr-2"
+                :style="{
+                  color: statusStars.isUserReadyStars ? 'yellow' : 'white',
+                }"
+              />
+              {{ stars }}
+              Stars
+            </button>
+          </ClientOnly>
           <div class="flex flex-1 items-center">
             <IconsComment class="mr-2" /> Comments
           </div>
@@ -75,8 +84,6 @@
 </template>
 
 <script lang="ts" setup>
-import { RowTags } from "~/types/tags";
-
 const props = defineProps({
   coverImgUrl: {
     type: String,
@@ -120,5 +127,46 @@ const props = defineProps({
   },
 });
 
-// const postsLink = ref(`/app/${props.username}/${props.post_id}`);
+import { RowTags } from "~/types/tags";
+
+const { useHandlerStars, useCountStarsWherePostID, useStatusStars } =
+  usePosts();
+
+const stars = ref(0);
+
+const statusStars = reactive({
+  isUserReadyStars: false,
+});
+
+const updateStatusStars = async () => {
+  let { data, error } = await useStatusStars(props.post_id!, props.user_id);
+  statusStars.isUserReadyStars = data!;
+};
+
+const countingStars = async () => {
+  console.log("counting stars");
+  stars.value = await useCountStarsWherePostID(props.post_id!).then(
+    (r) => r.data!
+  );
+  console.log(stars.value);
+};
+
+const handlerStars = async () => {
+  await updateStatusStars();
+  if (statusStars.isUserReadyStars) {
+    await useHandlerStars(props.post_id!, props.user_id);
+    stars.value -= 1;
+  } else {
+    await useHandlerStars(props.post_id!, props.user_id);
+    stars.value += 1;
+  }
+};
+
+onBeforeMount(async () => {
+  await countingStars();
+});
+
+watch(stars, async (newPayload, oldPayload) => {
+  await updateStatusStars();
+});
 </script>
