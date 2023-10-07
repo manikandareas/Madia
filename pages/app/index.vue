@@ -20,7 +20,7 @@
     <!-- content -->
     <AppHomeContent>
       <AppHomePosts
-        v-for="post in ( payload as RowPosts[])"
+        v-for="post in ( listOfPosts as RowPosts[])"
         :key="post.title"
         :avatar-img-url="post.user.avatar_url || 'https://placehold.co/40'"
         :cover-img-url="post.cover_image_url!"
@@ -51,12 +51,31 @@
 import { RowPosts } from "~/types/posts";
 
 // TODO: schema fetch posts
-const { useFetchAllPosts, useGetListsTags } = usePosts();
-
-const { data: payload, error } = await useFetchAllPosts();
+const { useFetchAllPosts, useGetListsTags, useFetchSinglePosts } = usePosts();
 
 const { data: listOfTags } = await useGetListsTags();
-console.log(payload);
+
+const client = useSupabase();
+
+const listOfPosts = ref<RowPosts[]>();
+
+const { data: payload, error } = await useFetchAllPosts();
+listOfPosts.value = payload;
+
+const posts = client
+  .channel("custom-insert-channel")
+  .on(
+    "postgres_changes",
+    { event: "INSERT", schema: "public", table: "posts" },
+    async (raw) => {
+      const { data: sPost } = await useFetchSinglePosts(raw.new.id);
+
+      if (raw.new) {
+        listOfPosts.value = [...listOfPosts.value!, sPost!];
+      }
+    }
+  )
+  .subscribe();
 
 const topTags: Array<{
   tag: string;

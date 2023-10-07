@@ -52,6 +52,8 @@ const useInsertPosts = async ({
 const useFetchAllPosts = async () => {
   const client = useSupabase();
 
+  let data: RowPosts[] = [];
+
   const {
     count,
     data: payload,
@@ -74,7 +76,9 @@ const useFetchAllPosts = async () => {
     )
   `);
 
-  const data = payload && (payload as RowPosts[]);
+  payload && (data = payload as RowPosts[]);
+
+  // const data = payload && (payload as RowPosts[]);
 
   return { count, data, error, status, statusText };
 };
@@ -159,7 +163,6 @@ const useGetListsTags = async () => {
   const client = useSupabase();
   let { data: tags, error } = await client.from("tags").select("*");
   let data = tags as RowTags[];
-  console.log(data);
 
   return {
     data,

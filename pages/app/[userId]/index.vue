@@ -47,7 +47,6 @@ const { data: profile } = await useSelectProfileByID(
 );
 
 const { data: posts } = await useFetchPostsByID(route.params.userId! as string);
-console.log(posts);
 
 const enableCustomLayout = () => {
   if (!user.value) {

@@ -151,8 +151,6 @@ const statusStars = reactive({
   isUserReadyStars: false,
 });
 
-console.log(statusStars.isUserReadyStars);
-
 const updateStatusStars = async () => {
   let { data, error } = await useStatusStars(props.post_id!, privateData?.id!);
   statusStars.isUserReadyStars = data!;
