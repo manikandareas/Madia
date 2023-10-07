@@ -145,14 +145,23 @@
               />
 
               <div class="md:px-14 flex justify-between">
-                <button
-                  v-if="!isLoading"
-                  type="submit"
-                  class="px-4 py-2 font-bold w-fit bg-green-500 text-white rounded-lg"
-                >
-                  Publish
-                </button>
-                <UIButtonLoading v-else />
+                <div class="flex space-x-2">
+                  <button
+                    v-if="!isLoading"
+                    type="submit"
+                    class="px-6 py-2 font-bold w-fit bg-green-500 text-white rounded-lg"
+                  >
+                    Publish
+                  </button>
+                  <UIButtonLoading v-else />
+                  <button
+                    type="button"
+                    @click="handlerResetForm"
+                    class="px-6 py-2 font-bold w-fit bg-red-500 text-white rounded-lg"
+                  >
+                    Reset
+                  </button>
+                </div>
 
                 <p
                   class="text-sm text-slate-400 text-end max-w-[70%]"
@@ -166,7 +175,13 @@
                     >show</NuxtLink
                   >
                   to preview image and
-                  <NuxtLink class="underline text-red-500">cancel</NuxtLink>
+                  <button
+                    type="button"
+                    @click="handlerRemoveCoverImage"
+                    class="underline text-red-500"
+                  >
+                    cancel
+                  </button>
                   to remove image.
                 </p>
               </div>
@@ -282,6 +297,9 @@ import "@uppy/status-bar/dist/style.min.css";
 import "@uppy/progress-bar/dist/style.min.css";
 import "@uppy/dashboard/dist/style.css";
 import { RowTags } from "~/types/tags";
+import toolbars from "~/utils/toolbars";
+import { useStorage } from "@vueuse/core";
+
 const client = useSupabase();
 const config = useRuntimeConfig();
 const form = reactive({
@@ -292,19 +310,19 @@ const form = reactive({
   tags: [] as RowTags[],
 });
 
+const postMemoize = useStorage("new-post", form, localStorage);
+
 const queryTags = ref("");
 const { $toast } = useNuxtApp();
 const {
   data: { user },
 } = await client.auth.getUser();
 
-const bucketName = "madia";
-
 const date = new Date().getTime();
 
 const folderName = `${user?.id}/cover_posts/${form.title + date}.png`;
 
-const supabaseUploadURL = `${config.public.SUPABASE_URL}/storage/v1/object/${bucketName}/${folderName}`;
+const supabaseUploadURL = `${config.public.SUPABASE_URL}/storage/v1/object/madia/${folderName}`;
 
 const { useGetPublicURL, useInsertPosts, useGetListsTags } = usePosts();
 
@@ -335,7 +353,7 @@ uppy.on("file-added", (file) => {
   uppyImage.value = file;
   file.meta = {
     ...file.meta,
-    bucketName: bucketName,
+    bucketName: "madia",
     objectName: folderName,
     contentType: file.type,
   };
@@ -353,26 +371,6 @@ const handleClose = () => {
 
 const mdHeadingId = (_text: string, _level: string, index: string) =>
   `H-${index}`;
-
-const toolbars = ref<string[]>([
-  "bold",
-  "underline",
-  "italic",
-  "-",
-  "title",
-  "quote",
-  "orderedList",
-  "unorderedList",
-  "task",
-  "-",
-  "code",
-  "codeRow",
-  "link",
-  "-",
-  "prettier",
-  "=",
-  "pageFullscreen",
-]);
 
 const inputActive = ref("");
 
@@ -397,6 +395,8 @@ const onSubmitPress = async () => {
       duration: 120000,
       dismissible: true,
     });
+
+    postMemoize.value = null;
   } catch (err) {
     throw err;
   } finally {
@@ -404,12 +404,36 @@ const onSubmitPress = async () => {
   }
 };
 
+const handlerRemoveCoverImage = async () => {
+  const { data, error } = await client.storage
+    .from("madia")
+    .remove([folderName]);
+
+  if (!error) form.cover_image_url = "";
+};
+
+const handlerResetForm = () => {
+  form.title = "";
+  form.descriptions = "";
+  form.tags = [];
+  form.cover_image_url = "";
+};
+
 watch(form, (newValue) => {
   form.descriptions = newValue.descriptions;
+
+  postMemoize.value = newValue;
 });
 
 definePageMeta({
   layout: "blog",
+});
+
+onBeforeMount(() => {
+  form.cover_image_url = postMemoize.value.cover_image_url || "";
+  form.title = postMemoize.value.title || "";
+  form.descriptions = postMemoize.value.descriptions || "";
+  form.tags = postMemoize.value.tags || [];
 });
 
 onUnmounted(() => {

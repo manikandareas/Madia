@@ -51,8 +51,7 @@
 import { RowPosts } from "~/types/posts";
 
 // TODO: schema fetch posts
-const { useFetchAllPosts, useGetListsTags, useFetchAllPostsWhereTags } =
-  usePosts();
+const { useFetchAllPosts, useGetListsTags } = usePosts();
 
 const { data: payload, error } = await useFetchAllPosts();
 

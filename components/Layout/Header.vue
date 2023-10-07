@@ -67,7 +67,7 @@ const pages: Array<{ URL: string; page: string }> = [
     page: "Home",
   },
   {
-    URL: "/",
+    URL: "/about",
     page: "About",
   },
   {

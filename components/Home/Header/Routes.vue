@@ -2,11 +2,7 @@
   <li>
     <NuxtLink
       :to="URL"
-      :class="{
-        'text-white': page !== 'Home',
-        'text-green-500': page === 'Home',
-      }"
-      class="rounded hover:bg-gray-100 md:hover:bg-transparent md:hover:text-green-700 md:p-0 md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
+      class="rounded hover:bg-gray-100 active:text-green-500 focus:text-green-500 text-white md:hover:bg-transparent md:hover:text-green-700 md:p-0 md:dark:hover:text-green-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent dark:border-gray-700"
       >{{ page }}</NuxtLink
     >
   </li>
