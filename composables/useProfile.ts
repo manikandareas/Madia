@@ -16,6 +16,42 @@ const useSelectProfileByID = async (id: string) => {
   };
 };
 
+const useCheckProfileByEmail = async (email: string) => {
+  const client = useSupabase();
+
+  const { data, error } = await client
+    .from("profile")
+    .select("email")
+    .eq("email", email);
+
+  if (data?.length! > 0) {
+    return {
+      data: true,
+      error: "Email already exists, signin now",
+    };
+  } else {
+    return {
+      data: false,
+      error: null,
+    };
+  }
+};
+
+const useGetAllProfileByUsername = async (username: string) => {
+  const client = useSupabase();
+
+  const { data, error } = await client
+    .from("profile")
+    .select("*")
+    .ilike("username", `%${username}%`);
+
+  return {
+    data: data as RowProfile[],
+
+    error,
+  };
+};
+
 const useUpdateProfile = async (x: UpdateProfile) => {
   const client = useSupabase();
 
@@ -50,7 +86,9 @@ const useUpdateProfile = async (x: UpdateProfile) => {
 
 export const useProfile = () => {
   return {
+    useCheckProfileByEmail,
     useUpdateProfile,
     useSelectProfileByID,
+    useGetAllProfileByUsername,
   };
 };

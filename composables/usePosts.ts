@@ -200,6 +200,25 @@ const useCountStarsWherePostID = async (p_post_id: number) => {
   };
 };
 
+const useGetAllPostsByTitle = async (title: string) => {
+  type QueryPosts = {
+    title: string;
+    posts_url: string;
+  };
+  const client = useSupabase();
+
+  const { data, error } = await client
+    .from("posts")
+    .select("title, posts_url")
+    .ilike("title", `%${title}%`)
+    .limit(10);
+
+  return {
+    data: data as QueryPosts[],
+    error,
+  };
+};
+
 const useHandlerStars = async (p_post_id: number, p_user_id: string) => {
   const client = useSupabase();
 
@@ -242,5 +261,6 @@ export const usePosts = () => {
     useCountStarsWherePostID,
     useHandlerStars,
     useFetchAllPostsWhereTags,
+    useGetAllPostsByTitle,
   };
 };

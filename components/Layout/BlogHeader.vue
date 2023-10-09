@@ -6,18 +6,56 @@
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-2"
     >
       <!-- left -->
-      <div class="flex space-x-4 items-center">
+      <div class="flex space-x-4 items-center relative">
         <NuxtLink to="/app"><IconsMadiaGreen /></NuxtLink>
         <form class="flex items-center relative">
           <input
             type="text"
             placeholder="Find your friends..."
+            v-model="searchInput"
             class="transition-all ease-in-out bg-zinc-950 rounded-md border-none outline outline-slate-600 outline-1 focus:outline-2 active:outline-green-500 focus:outline-green-500 w-[420px] text-slate-100 p-2"
           />
           <button class="invisible pointer-events-auto flex items-center">
             <IconsSearch class="absolute right-2 cursor-pointer visible" />
           </button>
         </form>
+        <div
+          class="w-[420px] bg-black/70 backdrop-blur-sm h-auto absolute top-11 right-0 rounded-lg p-4"
+          v-if="queryFromSearch.length > 0"
+        >
+          <ul class="flex flex-col space-y-2">
+            <li
+              v-for="(item, id) in (queryFromSearch as QueryPosts[])"
+              :key="id"
+              class="hover:underline cursor-pointer border-b border-green-500"
+              v-if="searchInput.charAt(0) !== '@'"
+            >
+              <NuxtLink :to="item.posts_url">{{ item.title }}</NuxtLink>
+            </li>
+
+            <li
+              v-for="item in (queryFromSearch as RowProfile[])"
+              :key="item.id"
+              class="hover:underline cursor-pointer border-b border-green-500/50 p-1"
+              v-else
+            >
+              <NuxtLink :to="`/app/${item.id}`" class="flex gap-2 items-center"
+                ><NuxtImg
+                  :src="item.avatar_url || 'https://placehold.co/40'"
+                  class="w-[40px] h-[40px] rounded-full overflow-hidden"
+                />
+                <div class="flex flex-col">
+                  <h3 class="text-xl font-bold">
+                    @{{ item.username }}
+                    <p class="text-xs font-bold text-slate-300">
+                      {{ item.name }}
+                    </p>
+                  </h3>
+                </div></NuxtLink
+              >
+            </li>
+          </ul>
+        </div>
       </div>
 
       <!-- right -->
@@ -173,11 +211,13 @@
 </template>
 
 <script lang="ts" setup>
+import { RowProfile } from "~/types/profile";
+
 const client = useSupabase();
 
 const router = useRouter();
 
-const { useSelectProfileByID } = useProfile();
+const { useSelectProfileByID, useGetAllProfileByUsername } = useProfile();
 
 const {
   data: { user },
@@ -185,8 +225,6 @@ const {
 } = await client.auth.getUser();
 
 const { data: profile } = await useSelectProfileByID(user?.id!);
-
-const searchInput = ref("");
 
 const source = ref("@manikxixi");
 
@@ -201,6 +239,51 @@ function closeModal() {
 function openModal() {
   isOpen.value = true;
 }
+
+const { useGetAllPostsByTitle } = usePosts();
+
+const searchInput = ref<string>("");
+
+type QueryPosts = {
+  title: string;
+  posts_url: string;
+};
+
+const queryFromSearch = ref<RowProfile[] | QueryPosts[]>([]);
+
+async function handleSearching() {
+  if (searchInput.value.charAt(0) === "@") {
+    const { data, error: smError } = await useGetAllProfileByUsername(
+      searchInput.value.slice(1)
+    );
+    queryFromSearch.value = data;
+
+    console.log("kepanggil");
+  } else {
+    const { data, error } = await useGetAllPostsByTitle(searchInput.value);
+
+    queryFromSearch.value = data;
+
+    console.log({
+      data,
+      query: queryFromSearch.value,
+    });
+  }
+}
+console.log(queryFromSearch.value);
+
+watchDebounced(
+  searchInput,
+  async () => {
+    console.log("changed! ", searchInput.value);
+    if (searchInput.value.length >= 3) {
+      await handleSearching();
+    } else {
+      queryFromSearch.value = [];
+    }
+  },
+  { debounce: 3000, maxWait: 3500 }
+);
 
 onUnmounted(() => {
   searchInput.value = "";

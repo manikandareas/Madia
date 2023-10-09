@@ -101,13 +101,10 @@ const topTags: Array<{
 ];
 
 const user = useSupabaseUser();
-// TODO : Filtering posts by tags
-// const queryOfURL = ref(route.query.tags);
 
-// const { data } = await useFetchAllPostsWhereTags(route.query.tags as string);
-// console.log("Sedang pengambilan data");
+// searh
 
-// filteredPosts.value = data;
+function handleSearching() {}
 
 const enableCustomLayout = () => {
   if (!user.value) {
