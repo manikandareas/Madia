@@ -5,13 +5,23 @@
       <div class="w-full flex flex-col p-4 space-y-2">
         <h4 class="font-bold text-xl">🏷️ Tags</h4>
         <ul class="flex flex-col space-y-2">
-          <li v-for="tag in listOfTags" :key="tag.id">
-            <nuxt-link
-              :to="`?tags=${tag.tag}`"
+          <li>
+            <button
+              type="button"
+              @click="handlerFilterTags('all')"
               class="hover:underline hover:text-green-500 cursor-pointer"
-              ><span :style="{ color: tag.color }">#</span>
-              {{ tag.tag }}</nuxt-link
             >
+              <span class="text-green-500">#</span> All Posts
+            </button>
+          </li>
+          <li v-for="tag in listOfTags" :key="tag.id">
+            <button
+              type="button"
+              @click="handlerFilterTags(tag.tag)"
+              class="hover:underline hover:text-green-500 cursor-pointer"
+            >
+              <span :style="{ color: tag.color }">#</span> {{ tag.tag }}
+            </button>
           </li>
         </ul>
       </div>
@@ -20,7 +30,7 @@
     <!-- content -->
     <AppHomeContent>
       <AppHomePosts
-        v-for="post in ( listOfPosts as RowPosts[])"
+        v-for="post in ((secondPostsFromQuery?.length! > 0 ? secondPostsFromQuery : listOfPosts) as RowPosts[])"
         :key="post.title"
         :avatar-img-url="post.user.avatar_url || 'https://placehold.co/40'"
         :cover-img-url="post.cover_image_url!"
@@ -59,8 +69,12 @@ const client = useSupabase();
 
 const listOfPosts = ref<RowPosts[]>();
 
+// const queryOfPosts = ref<RowPosts[]>();
+
 const { data: payload, error } = await useFetchAllPosts();
 listOfPosts.value = payload;
+
+const secondPostsFromQuery = ref<RowPosts[]>();
 
 const posts = client
   .channel("custom-insert-channel")
@@ -71,7 +85,7 @@ const posts = client
       const { data: sPost } = await useFetchSinglePosts(raw.new.id);
 
       if (raw.new) {
-        listOfPosts.value = [...listOfPosts.value!, sPost!];
+        listOfPosts.value = [sPost!, ...listOfPosts.value!];
       }
     }
   )
@@ -102,15 +116,26 @@ const topTags: Array<{
 
 const user = useSupabaseUser();
 
-// searh
-
-function handleSearching() {}
-
 const enableCustomLayout = () => {
   if (!user.value) {
     setPageLayout("auth");
   } else {
     setPageLayout("blog");
+  }
+};
+
+// const route = useRoute();
+// const router = useRouter();
+
+const handlerFilterTags = async (qTag: string) => {
+  if (qTag !== "all") {
+    secondPostsFromQuery.value = listOfPosts.value?.filter((post) =>
+      post.tags.map((tag) => tag.tag).includes(qTag)
+    );
+  } else {
+    secondPostsFromQuery.value = [];
+    const { data, error } = await useFetchAllPosts();
+    listOfPosts.value = data;
   }
 };
 

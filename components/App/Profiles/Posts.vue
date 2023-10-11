@@ -14,7 +14,7 @@
           <div class="overflow-hidden max-w-[40px]">
             <NuxtImg
               :src="props.avatarImgUrl || 'https://placehold.co/40'"
-              class="rounded-full max-h-[40px] overflow-hidden"
+              class="rounded-full w-[40px] h-[40px] overflow-hidden"
             />
           </div>
           <div class="leading-[17px]">

@@ -6,7 +6,7 @@ export interface RowPosts {
   descriptions?: string;
   id: number;
   stars?: string[] | null;
-  tags: RowTags[] | null;
+  tags: RowTags[];
   title: string;
   views: number | null;
   posts_url: string | null;

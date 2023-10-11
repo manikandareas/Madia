@@ -49,38 +49,114 @@ const useInsertPosts = async ({
   return { data, count, error, status, statusText };
 };
 
-const useFetchAllPosts = async () => {
+// const useFetchAllPosts = async () => {
+//   const client = useSupabase();
+
+//   let data: RowPosts[] = [];
+
+//   const {
+//     count,
+//     data: payload,
+//     error,
+//     status,
+//     statusText,
+//   } = await client.from("posts").select(`
+//     id,
+//     title,
+//     cover_image_url,
+//     views,
+//     tags,
+//     posts_url,
+//     created_at,
+//     user (
+//       id,
+//       username,
+//       name,
+//       avatar_url
+//     )
+//   `);
+
+//   payload && (data = payload as RowPosts[]);
+
+//   // const data = payload && (payload as RowPosts[]);
+
+//   return { count, data, error, status, statusText };
+// };
+
+const useFetchAllPosts = async (query?: RowTags) => {
   const client = useSupabase();
 
   let data: RowPosts[] = [];
 
-  const {
-    count,
-    data: payload,
-    error,
-    status,
-    statusText,
-  } = await client.from("posts").select(`
-    id,
-    title,
-    cover_image_url,
-    views,
-    tags,
-    posts_url,
-    created_at,
-    user (
+  if (!query) {
+    const {
+      count,
+      data: payload,
+      error,
+      status,
+      statusText,
+    } = await client.from("posts").select(`
       id,
-      username,
-      name,
-      avatar_url
-    )
-  `);
+      title,
+      cover_image_url,
+      views,
+      tags,
+      posts_url,
+      created_at,
+      user (
+        id,
+        username,
+        name,
+        avatar_url
+      )
+    `);
 
-  payload && (data = payload as RowPosts[]);
+    return {
+      count,
+      error,
 
-  // const data = payload && (payload as RowPosts[]);
+      status,
+      statusText,
+      data: (data = payload as RowPosts[]),
+    };
+  } else {
+    const {
+      count,
+      data: payload,
+      error,
+      status,
+      statusText,
+    } = await client.from("posts").select(`
+      id,
+      title,
+      cover_image_url,
+      views,
+      tags,
+      posts_url,
+      created_at,
+      user (
+        id,
+        username,
+        name,
+        avatar_url
+      )
+    `);
 
-  return { count, data, error, status, statusText };
+    let temp = payload as RowPosts[];
+    console.log(temp);
+
+    data = temp.filter((post) =>
+      post.tags.map((tag) => tag.tag).includes(query.tag)
+    );
+    console.log(temp);
+    return {
+      count,
+      error,
+      status,
+      statusText,
+      data,
+    };
+  }
 };
 
 const useFetchSinglePosts = async (id: number) => {
@@ -204,12 +280,13 @@ const useGetAllPostsByTitle = async (title: string) => {
   type QueryPosts = {
     title: string;
     posts_url: string;
+    tags: RowTags[];
   };
   const client = useSupabase();
 
   const { data, error } = await client
     .from("posts")
-    .select("title, posts_url")
+    .select("title, posts_url, tags")
     .ilike("title", `%${title}%`)
     .limit(10);
 

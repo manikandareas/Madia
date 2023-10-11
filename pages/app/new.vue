@@ -61,7 +61,6 @@
                       v-if="form.tags.length > 0"
                       v-for="tag in form.tags"
                       :key="tag.id"
-                      class="hover:bg-[]"
                     >
                       <div class="flex items-center space-x-2">
                         <small class="text-base flex items-center"
@@ -149,7 +148,7 @@
                   <button
                     v-if="!isLoading"
                     type="submit"
-                    class="px-6 py-2 font-bold w-fit bg-green-500 text-white rounded-lg"
+                    class="px-6 py-2 font-bold w-fit bg-green-500 hover:bg-opacity-80 transition-all ease-in-out text-white rounded-lg"
                   >
                     Publish
                   </button>
@@ -157,7 +156,7 @@
                   <button
                     type="button"
                     @click="handlerResetForm"
-                    class="px-6 py-2 font-bold w-fit bg-red-500 text-white rounded-lg"
+                    class="px-6 py-2 font-bold w-fit bg-red-500 hover:bg-opacity-80 transition-all ease-in-out text-white rounded-lg"
                   >
                     Reset
                   </button>
@@ -246,11 +245,10 @@
                   <div>
                     <NuxtImg
                       :src="
-                        avatar_url
-                          ? avatar_url
-                          : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
+                        avatar_url ||
+                        'https://cdn-icons-png.flaticon.com/512/149/149071.png'
                       "
-                      class="rounded-full max-h-[40px] object-cover"
+                      class="rounded-full h-[40px] w-[40px] object-cover"
                     />
                   </div>
                   <div class="leading-[17px]">
@@ -324,6 +322,8 @@ const folderName = `${user?.id}/cover_posts/${form.title + date}.png`;
 
 const supabaseUploadURL = `${config.public.SUPABASE_URL}/storage/v1/object/madia/${folderName}`;
 
+const isUploadSuccess = ref<boolean>(false);
+
 const { useGetPublicURL, useInsertPosts, useGetListsTags } = usePosts();
 
 const { useSelectProfileByID } = useProfile();
@@ -359,8 +359,20 @@ uppy.on("file-added", (file) => {
   };
 });
 
+uppy.on("file-removed", (file) => {
+  uppyImage.value = null;
+});
+
+uppy.on("upload-success", () => {
+  isUploadSuccess.value = true;
+});
+
 uppy.on("dashboard:modal-closed", async () => {
-  form.cover_image_url = await useGetPublicURL(folderName);
+  if (isUploadSuccess.value) {
+    form.cover_image_url = await useGetPublicURL(folderName);
+
+    isUploadSuccess.value = false;
+  }
 });
 
 const open = ref(false);
@@ -433,7 +445,6 @@ onBeforeMount(() => {
   form.cover_image_url = postMemoize.value.cover_image_url || "";
   form.title = postMemoize.value.title || "";
   form.descriptions = postMemoize.value.descriptions || "";
-  form.tags = postMemoize.value.tags || [];
 });
 
 onUnmounted(() => {

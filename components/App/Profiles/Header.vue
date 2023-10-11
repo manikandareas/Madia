@@ -2,8 +2,9 @@
   <header class="w-full h-[364px] rounded-lg relative bg-zinc-900">
     <!-- image -->
     <NuxtImg
-      src="https://placehold.co/112"
-      class="w-[112px] rounded-full border-[6px] border-black absolute right-[calc((100%/2)-56px)] -top-[56px]"
+      :src="profile.avatar_url || 'https://placehold.co/112'"
+      :alt="profile.name!"
+      class="w-[112px] h-[112px] rounded-full border-[6px] border-black absolute right-[calc((100%/2)-56px)] -top-[56px]"
     />
     <!-- action right -->
     <div class="flex space-x-4 place-content-end p-8">

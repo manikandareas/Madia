@@ -30,7 +30,17 @@
               class="hover:underline cursor-pointer border-b border-green-500"
               v-if="searchInput.charAt(0) !== '@'"
             >
-              <NuxtLink :to="item.posts_url">{{ item.title }}</NuxtLink>
+              <NuxtLink :to="item.posts_url"
+                ><div class="flex flex-col items-start justify-start">
+                  <h3 class="text-xl font-bold">
+                    {{ item.title }}
+                    <small v-for="tag in item.tags">
+                      <span :style="{ color: tag.color }">#</span
+                      >{{ tag.tag }}</small
+                    >
+                  </h3>
+                </div></NuxtLink
+              >
             </li>
 
             <li
@@ -212,6 +222,7 @@
 
 <script lang="ts" setup>
 import { RowProfile } from "~/types/profile";
+import { RowTags } from "~/types/tags";
 
 const client = useSupabase();
 
@@ -226,7 +237,7 @@ const {
 
 const { data: profile } = await useSelectProfileByID(user?.id!);
 
-const source = ref("@manikxixi");
+const source = ref(profile.username!);
 
 const { copy, isSupported } = useClipboard({ source });
 
@@ -247,6 +258,7 @@ const searchInput = ref<string>("");
 type QueryPosts = {
   title: string;
   posts_url: string;
+  tags: RowTags[];
 };
 
 const queryFromSearch = ref<RowProfile[] | QueryPosts[]>([]);
@@ -257,17 +269,10 @@ async function handleSearching() {
       searchInput.value.slice(1)
     );
     queryFromSearch.value = data;
-
-    console.log("kepanggil");
   } else {
     const { data, error } = await useGetAllPostsByTitle(searchInput.value);
 
     queryFromSearch.value = data;
-
-    console.log({
-      data,
-      query: queryFromSearch.value,
-    });
   }
 }
 console.log(queryFromSearch.value);

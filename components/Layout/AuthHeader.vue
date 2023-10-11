@@ -1,5 +1,7 @@
 <template>
-  <header class="md:block hidden sticky top-0 left-0 w-full z-50 bg-black">
+  <header
+    class="md:block hidden sticky top-0 left-0 w-full z-50 bg-zinc-900 border-b border-zinc-950"
+  >
     <nav
       class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-3"
     >

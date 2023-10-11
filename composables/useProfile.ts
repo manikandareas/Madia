@@ -74,6 +74,7 @@ const useUpdateProfile = async (x: UpdateProfile) => {
         : prevData?.instagram_url,
       github_url: x.github_url ? x.github_url : prevData?.github_url,
       linkedin_url: x.linkedin_url ? x.linkedin_url : prevData?.linkedin_url,
+      avatar_url: x.avatar_url ? x.avatar_url : prevData?.avatar_url,
     })
     .eq("id", x.id!)
     .select();
